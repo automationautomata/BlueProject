@@ -1,0 +1,5 @@
+**/venv
+index.html
+requirements.txt
+app.py
+Dockerfile
