@@ -7,6 +7,7 @@ class DatabaseProperties(ABC):
     @abstractmethod
     def useproperties(self, cursor: sqllite.Cursor) -> None: 
         pass
+    
 # Шаблон класса для установки соединений с БД
 class DatabaseConnection(ABC):
     @abstractmethod
@@ -83,7 +84,9 @@ class AccessControl(DatabaseConnection):
 
     def execute(self, command, *params): 
         cursor = self._connection_.cursor()
-        return cursor.execute(command, params)
+        result = cursor.execute(command, params)
+        self._connection_.commit()
+        return result
     
     def closeconnection(self):
         self._connection_.close()
