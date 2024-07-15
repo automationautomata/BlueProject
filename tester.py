@@ -7,26 +7,7 @@ class DatabaseProperties(ABC):
     @abstractmethod
     def useproperties(self, cursor: sqllite.Cursor) -> None: 
         pass
-    
-# Шаблон класса для установки соединений с БД
-class DatabaseConnection(ABC):
-    @abstractmethod
-    def establish_connection(self, rootpath: str) -> None:
-        pass
-    @abstractmethod
-    def establish_connection(self, properties: list[DatabaseProperties], 
-                            rootpath: str, name: str) -> None:
-        pass
-    # Метод для создания базы или, при ее утрате, восстановления
-    @abstractmethod
-    def _createdatabase_(self) -> None: 
-        pass
-    @abstractmethod
-    def execute(self, command: str, *params) -> None: 
-        pass
-    @abstractmethod
-    def closeconnection(self) -> None: 
-        pass
+
 
 class AccessControl():
     def __init__(self, scriptpath: str, name: str) -> None:
@@ -35,12 +16,18 @@ class AccessControl():
         self.__scriptpath = scriptpath
         self.__name = name
 
-    # Нужно понять - надо ли оставлять properties, они нужны для выполнения команд создания БД, 
-    # дополнительно к скрипту
-    def establish_connection(self, properties: list[str] = [], dirpath: str = './') -> None:
+    def establish_connection(self, path: str = './') -> None:
+        '''Устанавливает соединение и, если БД отсутствует,
+        то пересоздает ее на основе указанного скрипта.'''
+        #self.__path = path
+        if not os.path.isfile(path):
+            self._createdatabase_(path)
+    
+    def establish_connection(self, properties: list[str] = [], path: str = './') -> None:
         '''Устанавливает соединение c базой в path и, если БД отсутствует,
         то пересоздает ее на основе указанного скрипта.'''
-        path = f"{dirpath}{self.__name}"
+        #self.__path = path
+        self.__properties__ = properties
         if not os.path.isfile(path):
             self._createdatabase_(path)
         else:
@@ -61,8 +48,6 @@ class AccessControl():
         # Создаем таблицы
         for statsment in statsments:
             cursor.execute(statsment)
-        # for property in properties:
-        #     cursor.execute(statsment)
         self._connection_.commit()
 
     def execute(self, command: str, *params) -> None: 
@@ -75,3 +60,6 @@ class AccessControl():
     def closeconnection(self) -> None:
         '''Закрывает соединение с базой.'''
         self._connection_.close()
+
+ac = AccessControl(name="SKUDdb", scriptpath="E:\BlueProject\dbscript.sql")
+ac.establish_connection(path="E:\BlueProject\SKUDdb")
