@@ -28,66 +28,54 @@ class DatabaseConnection(ABC):
     def closeconnection(self) -> None: 
         pass
 
+class AccessControl():
+    def __init__(self, scriptpath: str, name: str) -> None:
+        '''scriptpath - путь к скрипту, создающему бд,
+        name - название БД.'''
+        self.__scriptpath = scriptpath
+        self.__name = name
 
-class AccessControl(DatabaseConnection):
-    _instance = None
-    def __new__(cls, name):
-        if not cls._instance:
-            cls._instance = object.__new__(cls)
-            cls.__name__ = name
-        return cls._instance
+    def establish_connection(self, path: str = './') -> None:
+        '''Устанавливает соединение и, если БД отсутствует,
+        то пересоздает ее на основе указанного скрипта.'''
+        #self.__path = path
+        if not os.path.isfile(path):
+            self._createdatabase_(path)
     
-    def establish_connection(self, rootpath = './') -> None:
-        self.__rootpath__ = rootpath
-        if not os.path.isfile(f"{rootpath}{self.__name__}"):
-            self.__createdatabase__()
-    
-    def establish_connection(self, properties: list[DatabaseProperties], rootpath = './') -> None:
-        self.__rootpath__ = rootpath
-        self.__properties__ = properties
-        #self.__name__ = name
-        if not os.path.isfile(f"{rootpath}{self.__name__}"):
-            self.__createdatabase__()
-        else:
-            self._connection_ = sqllite.connect(f"{self.__rootpath__}{self.__name__}")
-    
-    def _createdatabase_(self):
-        self._connection_ = sqllite.connect(f"{self.__rootpath__}{self.__name__}")
+    # def establish_connection(self, properties: list[DatabaseProperties], path: str = './') -> None:
+    #     '''Устанавливает соединение c базой в path и, если БД отсутствует,
+    #     то пересоздает ее на основе указанного скрипта.'''
+    #     #self.__path = path
+    #     self.__properties__ = properties
+    #     if not os.path.isfile(path):
+    #         self._createdatabase_(path)
+    #     else:
+    #         self._connection_ = sqllite.connect(path)
+
+    def __readscript__(self) -> str:
+        '''Читает скрипт покомандно, используя ';' как разделитель.'''
+        script = open(self.__scriptpath, "r+")
+        sql = script.read().split(";")
+        script.close() 
+        return sql
+
+    def _createdatabase_(self, path: str) -> None:
+        '''Создает базу данных на основе скрипта.'''
+        self._connection_ = sqllite.connect(path)
         cursor = self._connection_.cursor()
-
+        statsments = self.__readscript__()
         # Создаем таблицы
-        cursor.execute('''
-            CREATE TABLE cards (
-                card VARCHAR(4) PRIMARY KEY,
-                status VARCHAR(1) NOT NULL
-            );
-            CREATE TABLE rooms (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name VARCHAR(40) NOT NULL
-            );
-            CREATE TABLE rights (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                right INTEGER NOT NULL,
-                FOREIGN KEY (room) REFERENCES rooms (id)
-                UNIQUE(right, room)
-            );
-            CREATE TABLE entities (
-                FOREIGN KEY (card) REFERENCES cards (card),
-                sid INTEGER PRIMARY KEY,
-                type VARCHAR(1) NOT NULL,
-                FOREIGN KEY (right) REFERENCES rights (id)
-            );
-        ''')
-        for property in self.__properties__:
-            property.useproperties(cursor)
+        for statsment in statsments:
+            cursor.execute(statsment)
         self._connection_.commit()
 
-    def execute(self, command, *params): 
+    def execute(self, command: str, *params) -> None: 
+        '''Выполняет указанную команду command с параметрами params (см. документацию SQLite).'''
         cursor = self._connection_.cursor()
         result = cursor.execute(command, params)
         self._connection_.commit()
         return result
     
-    def closeconnection(self):
+    def closeconnection(self) -> None:
+        '''Закрывает соединение с базой.'''
         self._connection_.close()
-
