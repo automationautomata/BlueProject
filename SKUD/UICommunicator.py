@@ -11,6 +11,15 @@ import asyncio
 #     print("Connection closed")
 
 # ws.run_forever()
+class Communicator(ABC):
+    @abstractmethod
+    def connect(self, path):
+        pass
+    def send(self, data):
+        pass
+    def recieve(self):
+        pass
+
 class UICommunicator:
     async def connect(self, path):
         self.path = path
