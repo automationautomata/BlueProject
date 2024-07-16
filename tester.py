@@ -1,65 +1,46 @@
-import os.path
-from abc import ABC, abstractmethod
-import sqlite3 as sqllite
+# import websocket
+# #import thread
+# import time
 
-# Шаблон класса, который настраивает базу данных
-class DatabaseProperties(ABC):
-    @abstractmethod
-    def useproperties(self, cursor: sqllite.Cursor) -> None: 
-        pass
+# def on_data(ws, message):
+#     print(type(message))
+#     print(message)
+
+# def on_error(ws, error):
+#     print(error)
+
+# def on_close(ws, s, a):
+#     print("### closed ###")
+
+# def on_open(ws):
+#     def run(*args):
+#         for i in range(30000):
+#             time.sleep(1)
+#             ws.send("Hello %d" % i)
+#         time.sleep(1)
+#         ws.close()
+#         print("thread terminating...")
+#     #thread.start_new_thread(run, ())
 
 
-class AccessControl():
-    def __init__(self, scriptpath: str, name: str) -> None:
-        '''scriptpath - путь к скрипту, создающему бд,
-        name - название БД.'''
-        self.__scriptpath = scriptpath
-        self.__name = name
+# websocket.enableTrace(True)
+# ws = websocket.WebSocketApp("ws://localhost:8080",
+#                             on_data = on_data,
+#                             on_error = on_error,
+#                             on_close = on_close, 
+#                             on_open = on_open)
 
-    def establish_connection(self, path: str = './') -> None:
-        '''Устанавливает соединение и, если БД отсутствует,
-        то пересоздает ее на основе указанного скрипта.'''
-        #self.__path = path
-        if not os.path.isfile(path):
-            self._createdatabase_(path)
-    
-    def establish_connection(self, properties: list[str] = [], path: str = './') -> None:
-        '''Устанавливает соединение c базой в path и, если БД отсутствует,
-        то пересоздает ее на основе указанного скрипта.'''
-        #self.__path = path
-        self.__properties__ = properties
-        if not os.path.isfile(path):
-            self._createdatabase_(path)
-        else:
-            self._connection_ = sqllite.connect(path)
+# ws.run_forever()
 
-    def __readscript__(self) -> str:
-        '''Читает скрипт покомандно, используя ';' как разделитель.'''
-        script = open(self.__scriptpath, "r+")
-        sql = script.read().split(";")
-        script.close() 
-        return sql
+from websocket import create_connection
 
-    def _createdatabase_(self, path: str) -> None:
-        '''Создает базу данных на основе скрипта.'''
-        self._connection_ = sqllite.connect(path)
-        cursor = self._connection_.cursor()
-        statsments = self.__readscript__()
-        # Создаем таблицы
-        for statsment in statsments:
-            cursor.execute(statsment)
-        self._connection_.commit()
+ws = create_connection("ws://localhost:8080")
 
-    def execute(self, command: str, *params) -> None: 
-        '''Выполняет указанную команду command с параметрами params (см. документацию SQLite).'''
-        cursor = self._connection_.cursor()
-        result = cursor.execute(command, params)
-        self._connection_.commit()
-        return result
-    
-    def closeconnection(self) -> None:
-        '''Закрывает соединение с базой.'''
-        self._connection_.close()
-
-ac = AccessControl(name="SKUDdb", scriptpath="E:\BlueProject\dbscript.sql")
-ac.establish_connection(path="E:\BlueProject\SKUDdb")
+while True:
+    msg = input('Enter a message: ')
+    if msg == 'quit':        
+        ws.close()
+        break
+    ws.send(msg)
+    result =  ws.recv()
+    print ('> ', result)

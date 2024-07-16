@@ -1,23 +1,14 @@
-import websocket
 import asyncio
-# def on_open(ws):
-#     print("Connection opened")
+from websockets.server import serve
 
+async def echo(websocket):
+    async for message in websocket:
+        print(message)
+        print("----------")
+        await websocket.send(message)
 
- 
-# def on_message(ws, message):
-#     print(f"Received message: {message}")
- 
-# def on_close(ws):
-#     print("Connection closed")
+async def main():
+    async with serve(echo, "localhost", 8080):
+        await asyncio.Future()  # run forever
 
-# ws.run_forever()
-class UICommunicator:
-    async def connect(self, path):
-        self.path = path
-        self.websocket = websocket.WebSocketApp("ws://example.com/ws", on_open=on_open,
-                                                 on_message=on_message, on_close=on_close) 
-        self.websocket.send("Hello")
-    async def handler(self, path):
-        message = await self.websocket.recv()
-        await self.websocket.send(f"Hello, {message}!")
+asyncio.run(main())

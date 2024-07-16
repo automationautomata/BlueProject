@@ -3,10 +3,10 @@ from abc import ABC, abstractmethod
 import sqlite3 as sqllite
 
 # Шаблон класса, который настраивает базу данных
-class DatabaseProperties(ABC):
-    @abstractmethod
-    def useproperties(self, cursor: sqllite.Cursor) -> None: 
-        pass
+# class DatabaseProperties(ABC):
+#     @abstractmethod
+#     def useproperties(self, cursor: sqllite.Cursor) -> None: 
+#         pass
     
 # Шаблон класса для установки соединений с БД
 class DatabaseConnection(ABC):
@@ -14,12 +14,11 @@ class DatabaseConnection(ABC):
     def establish_connection(self, rootpath: str) -> None:
         pass
     @abstractmethod
-    def establish_connection(self, properties: list[DatabaseProperties], 
-                            rootpath: str, name: str) -> None:
+    def establish_connection(self, properties: list[str] = [], dirpath: str = './') -> None:
         pass
     # Метод для создания базы или, при ее утрате, восстановления
     @abstractmethod
-    def _createdatabase_(self) -> None: 
+    def _createdatabase_(self, path: str) -> None: 
         pass
     @abstractmethod
     def execute(self, command: str, *params) -> None: 
@@ -28,7 +27,7 @@ class DatabaseConnection(ABC):
     def closeconnection(self) -> None: 
         pass
 
-class AccessControl():
+class AccessControl(DatabaseConnection):
     def __init__(self, scriptpath: str, name: str) -> None:
         '''scriptpath - путь к скрипту, создающему бд,
         name - название БД.'''
