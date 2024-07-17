@@ -32,15 +32,80 @@
 
 # ws.run_forever()
 
-from websocket import create_connection
+# from websocket import create_connection
 
-ws = create_connection("ws://localhost:8080")
+# ws = create_connection("ws://localhost:8080")
 
-while True:
-    msg = input('Enter a message: ')
-    if msg == 'quit':        
-        ws.close()
-        break
-    ws.send(msg)
-    result =  ws.recv()
-    print ('> ', result)
+# while True:
+#     msg = input('Enter a message: ')
+#     if msg == 'quit':        
+#         ws.close()
+#         break
+#     ws.send(msg)
+#     result =  ws.recv()
+#     print ('> ', result)
+
+# import websocket
+
+# def on_message(wsapp, message):
+#     print(message)
+
+# wsapp = websocket.WebSocketApp("ws://localhost:8080", on_message=on_message)
+
+# wsapp.run_forever() 
+
+import json
+import websocket
+from typing import Callable
+
+from SKUD.database import AccessControl
+
+
+class Comm:
+    def __init__(self, router: map[str, Callable[[str], str]], url="ws://localhost:8080") -> None:
+        self.url = url
+        self.router = router
+
+    def connect(self) -> None:
+        self.websocket = websocket.WebSocketApp(self.url, on_message=self.handler)
+        self.websocket.run_forever() 
+
+    def handler(self, wsapp: websocket.WebSocketApp, message: str) -> None:
+        print(message)
+        msg = json.loads(message)
+        func = self.router[msg['action']]
+        answer = func(msg['data'])
+        wsapp.send(answer)
+
+class Controller: 
+    DB_NAME = "SKUDdb"
+    SCRIPT_PATH = "E:\BlueProject\skudscript.sql"
+    ROOT_DIR = "E:\BlueProject\\"
+
+    def getentites(data: str) -> str:
+        db = AccessControl(Controller.SCRIPT_PATH, Controller.DB_NAME)
+        db.establish_connection(Controller.ROOT_DIR)
+        condition = " and ".join(f"{data["column"]} = {user}" for user in data["users"])
+        join_query = f"(select * from entities where {condition}) as e"
+        if data["extra"] == "rights":
+            join_query += " inner join rights on e.right = rights.right"
+        elif data["extra"] == "cards":   
+            join_query += " inner join cards on cards.id = e.card"
+        elif data["extra"] == "both":
+            join_query = f"(({join_query}inner join rights on e.right = rights.right) as er 
+                                            inner join cards on cards.id = er.card)"
+        result = db.execute(f'''select * from {join_query}''')
+        print(result)
+        return result
+    def createquery(main_table: str, join_tables: list[(str, str, str)] = None, 
+                    conditions: list[str] = None, ):
+        
+        pass
+    def getaccessrules(rights):
+        db = AccessControl(Controller.SCRIPT_PATH, Controller.DB_NAME)
+        db.establish_connection(Controller.ROOT_DIR)
+        condition = " and ".join(f"sid = {right}" for right in rights)
+        db.execute(f'''select * from (((select * from access_rules where {condition}) as e 
+                                        inner join rights on e.right = rights.right) as er 
+                                            inner join cards on cards.id = er.card)''')
+        
