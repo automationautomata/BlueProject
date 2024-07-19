@@ -12,7 +12,7 @@ def getentites(data: str) -> str:
     elif data["extra"] == "cards":   
         join_query += " inner join cards on cards.id = e.card"
     elif data["extra"] == "both":
-        join_query = f"(({join_query}inner join rights on e.right = rights.right) as er 
+        join_query = f"(({join_query} inner join rights on e.right = rights.right) as er 
                                         inner join cards on cards.id = er.card)"
     result = db.execute(f'''select * from {join_query}''')
     print(result)
