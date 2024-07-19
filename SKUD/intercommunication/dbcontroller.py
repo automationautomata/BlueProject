@@ -1,6 +1,6 @@
 
 from ORM.database import AccessControl
-import config
+import SKUD.config as config
 
 def getentites(data: str) -> str:
     db = AccessControl(config.SCRIPT_PATH, config.DB_NAME)

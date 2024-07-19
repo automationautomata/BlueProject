@@ -17,6 +17,7 @@ import json
 import websocket
 from typing import Callable
 
+#надо разделить на клиента и сервер
 class UiCommunicator:
     def __init__(self, router: dict[str, Callable[[str], str]], url="ws://localhost:8080") -> None:
         self.url = url

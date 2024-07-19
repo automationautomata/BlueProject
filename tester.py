@@ -112,7 +112,7 @@ import serial.tools.list_ports
 # Получаем список доступных Serial портов
 ports = list(serial.tools.list_ports.comports())
 # Выводим информацию о каждом порте
-print(ports)
+print(port)
 # for port in ports:
 #  print(f"Порт: {port.device}")
 #  print(f"Описание: {port.description}")
@@ -132,3 +132,6 @@ print(ports)
 # print(decoded_response)
 
 #time.sleep(10)
+
+#git config --global core.autocrlf false
+########################################
