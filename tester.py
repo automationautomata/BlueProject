@@ -56,13 +56,14 @@
 
 import json
 import websocket
+import config
 from typing import Callable
 
 from SKUD.database import AccessControl
 
 
-class Comm:
-    def __init__(self, router: map[str, Callable[[str], str]], url="ws://localhost:8080") -> None:
+class UiCommunicator:
+    def __init__(self, router: dict[str, Callable[[str], str]], url="ws://localhost:8080") -> None:
         self.url = url
         self.router = router
 
@@ -70,21 +71,18 @@ class Comm:
         self.websocket = websocket.WebSocketApp(self.url, on_message=self.handler)
         self.websocket.run_forever() 
 
-    def handler(self, wsapp: websocket.WebSocketApp, message: str) -> None:
+    def handler(self, ws: websocket.WebSocketApp, message: str) -> None:
         print(message)
         msg = json.loads(message)
         func = self.router[msg['action']]
         answer = func(msg['data'])
-        wsapp.send(answer)
+        ws.send(answer)
 
 class Controller: 
-    DB_NAME = "SKUDdb"
-    SCRIPT_PATH = "E:\BlueProject\skudscript.sql"
-    ROOT_DIR = "E:\BlueProject\\"
 
     def getentites(data: str) -> str:
-        db = AccessControl(Controller.SCRIPT_PATH, Controller.DB_NAME)
-        db.establish_connection(Controller.ROOT_DIR)
+        db = AccessControl(config.SCRIPT_PATH, config.DB_NAME)
+        db.establish_connection(config.ROOT_DIR)
         condition = " and ".join(f"{data["column"]} = {user}" for user in data["users"])
         join_query = f"(select * from entities where {condition}) as e"
         if data["extra"] == "rights":
@@ -97,13 +95,13 @@ class Controller:
         result = db.execute(f'''select * from {join_query}''')
         print(result)
         return result
+    
     def createquery(main_table: str, join_tables: list[(str, str, str)] = None, 
-                    conditions: list[str] = None, ):
-        
+                    conditions: list[str] = None):
         pass
     def getaccessrules(rights):
-        db = AccessControl(Controller.SCRIPT_PATH, Controller.DB_NAME)
-        db.establish_connection(Controller.ROOT_DIR)
+        db = AccessControl(config.SCRIPT_PATH, config.DB_NAME)
+        db.establish_connection(config.ROOT_DIR)
         condition = " and ".join(f"sid = {right}" for right in rights)
         db.execute(f'''select * from (((select * from access_rules where {condition}) as e 
                                         inner join rights on e.right = rights.right) as er 
