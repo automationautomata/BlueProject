@@ -13,3 +13,5 @@ class CardChecker(HardwareConnection):
     def EstablishConnection() -> None: pass
     def send(data) -> bool: pass
     def recieve() -> str: pass
+
+    

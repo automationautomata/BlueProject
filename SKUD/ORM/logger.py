@@ -1,7 +1,6 @@
-import os
 import sqlite3 as sqlite
-from database import DatabaseConnection
-from os import path
+from SKUD.ORM.database import DatabaseConnection
+import os 
 import datetime
 from itertools import product
 
