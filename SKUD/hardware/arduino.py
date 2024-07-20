@@ -17,6 +17,7 @@
 import time
 import serial
 import serial.tools.list_ports
+
 def getportsinfo() -> str:
     '''Возвращает информацию обо всех COM портах в json-подобном виде'''
     ports = list(serial.tools.list_ports.comports())
@@ -41,3 +42,5 @@ def communicate(port: str, data: str, baudrate: int = 9600) -> str | None:
         return decoded_response
     except NameError: 
         print(NameError)
+
+getportsinfo()

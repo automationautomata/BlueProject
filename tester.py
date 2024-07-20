@@ -110,13 +110,14 @@
 import time
 import serial.tools.list_ports
 # Получаем список доступных Serial портов
-ports = list(serial.tools.list_ports.comports())
+# ports = list(serial.tools.list_ports.comports())
 # Выводим информацию о каждом порте
-print(port)
-# for port in ports:
-#  print(f"Порт: {port.device}")
-#  print(f"Описание: {port.description}")
-#  print(f"Производитель: {port.manufacturer}\n")
+def getportsinfo() -> str:
+    '''Возвращает информацию обо всех COM портах в json-подобном виде'''
+    ports = list(serial.tools.list_ports.comports())
+    getinfo = lambda port: '{'+f"\"Port\": \"{port.device}\", \"Description\": \"{port.description}\", \"Manufacturer\": \"{port.manufacturer}\""+'}'
+    return '{'+f"{',\n'.join(getinfo(port) for port in ports)}"+'}'
+print(getportsinfo())
 
 # import serial
 # # Открываем Serial порт ('COMX' замените на имя вашего порта)

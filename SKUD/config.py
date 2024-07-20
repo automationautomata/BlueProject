@@ -14,5 +14,3 @@ ARDUINO_PORT = ["COM6"]
 
 WEBSOKET_URL = "ws://localhost:8080"
 '''Временный адрес для проверки работы вебсокета'''
-
-

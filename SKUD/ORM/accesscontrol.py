@@ -1,12 +1,14 @@
+import os.path
 import sqlite3 as sqlite
-from SKUD.ORM.database import DatabaseConnection
-import os 
-import datetime
-from itertools import product
 
-class Logger(DatabaseConnection):
-    def __init__(self, name: str) -> None:
-        '''name - название БД.'''
+from database import DatabaseConnection
+
+class AccessControl(DatabaseConnection):
+    '''Класс для взаимодействия с бд СКУДа'''
+    def __init__(self, scriptpath: str, name: str) -> None:
+        '''scriptpath - путь к скрипту, создающему бд,
+        name - название БД.'''
+        self.__scriptpath = scriptpath
         self.__name = name
 
     # Нужно понять - надо ли оставлять properties, они нужны для выполнения команд создания БД, 
@@ -20,33 +22,31 @@ class Logger(DatabaseConnection):
         else:
             self._connection_ = sqlite.connect(path)
 
+    def __readscript__(self) -> str:
+        '''Читает скрипт покомандно, используя ';' как разделитель.'''
+        script = open(self.__scriptpath, "r+")
+        sql = script.read().split(";")
+        script.close() 
+        return sql
+
     def _createdatabase_(self, path: str) -> None:
         '''Создает базу данных на основе скрипта.'''
         self._connection_ = sqlite.connect(path)
         cursor = self._connection_.cursor()
+        statsments = self.__readscript__()
         # Создаем таблицы
-        cursor.execute('''
-            CREATE TABLE logs (
-                id integer NOT NULL AUTOINCREMENT,
-                message TEXT, 
-                time TEXT
-            );
-        ''')        
+        for statsment in statsments:
+            cursor.execute(statsment)
         # for property in properties:
         #     cursor.execute(statsment)
         self._connection_.commit()
 
-    def execute(self, command: str, *params): 
+    def execute(self, command: str, *params) -> None: 
+        '''Выполняет указанную команду command с параметрами params (см. документацию SQLite).'''
         cursor = self._connection_.cursor()
         result = cursor.execute(command, params)
         self._connection_.commit()
         return result
-    
-    def addlog(self, messages: list[str]):
-        cursor = self._connection_.cursor()
-        sql = "INSERT INTO projects(message, time) VALUES(?,?)"
-        time = datetime.datetime.now().isoformat()
-        return cursor.execute(sql, list(product(messages, [time])))
     
     def closeconnection(self) -> None:
         '''Закрывает соединение с базой.'''
