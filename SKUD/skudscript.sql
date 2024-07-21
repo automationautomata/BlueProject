@@ -67,7 +67,6 @@ AS select room,
             from entities inner join rooms on room.id = access_rules.room    
                         inner join rights on access_rules.right = rights.right
 
-
 -------------------------TRIGGERS-------------------------
 -- Можно ли добавлять в таблицу записи с правом, которому в access_rules
 -- сопоставлены все записи с заполненным полем date_time_end ????

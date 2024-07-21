@@ -9,7 +9,7 @@ import sqlite3 as sqllite
 #         pass
     
 # Шаблон класса для установки соединений с БД
-class DatabaseConnection(ABC):
+class DatabaseABC(ABC):
     @abstractmethod
     def establish_connection(self, rootpath: str) -> None:
         pass
@@ -27,7 +27,7 @@ class DatabaseConnection(ABC):
     def closeconnection(self) -> None: 
         pass
 
-class AccessControl(DatabaseConnection):
+class DatabaseConnection(DatabaseABC):
     def __init__(self, scriptpath: str, name: str) -> None:
         '''scriptpath - путь к скрипту, создающему бд,
         name - название БД.'''
@@ -45,32 +45,25 @@ class AccessControl(DatabaseConnection):
         else:
             self._connection_ = sqllite.connect(path)
 
-    def __readscript__(self) -> str:
-        '''Читает скрипт покомандно, используя ';' как разделитель.'''
-        script = open(self.__scriptpath, "r+")
-        sql = script.read().split(";")
-        script.close() 
-        return sql
-
     def _createdatabase_(self, path: str) -> None:
         '''Создает базу данных на основе скрипта.'''
         self._connection_ = sqllite.connect(path)
         cursor = self._connection_.cursor()
-        statsments = self.__readscript__()
-        # Создаем таблицы
-        for statsment in statsments:
-            cursor.execute(statsment)
+        script = open(self.__scriptpath, "r+")
+
+        # Создаем базу
+        cursor.executescript(script)
         # for property in properties:
         #     cursor.execute(statsment)
         self._connection_.commit()
 
-    def execute(self, command: str, *params) -> None: 
+    def execute(self, command: str, *params) -> list[tuple]: 
         '''Выполняет указанную команду command с параметрами params (см. документацию SQLite).'''
         cursor = self._connection_.cursor()
         result = cursor.execute(command, params)
         self._connection_.commit()
         return result
     
-    def closeconnection(self) -> None:
+    def close(self) -> None:
         '''Закрывает соединение с базой.'''
         self._connection_.close()
