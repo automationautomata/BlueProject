@@ -1,5 +1,5 @@
 import sqlite3 as sqlite
-from SKUD.ORM.database import DatabaseConnection
+from ORM.database import DatabaseConnection
 import os 
 import datetime
 from itertools import product
