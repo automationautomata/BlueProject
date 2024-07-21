@@ -4,3 +4,4 @@ requirements.txt
 app.py
 Dockerfile
 **/.vscode
+**/__pychache__

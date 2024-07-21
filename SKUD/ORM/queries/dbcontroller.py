@@ -28,3 +28,7 @@ def getaccessrules(rights):
     db.execute(f'''select * from (((select * from access_rules where {condition}) as e 
                                     inner join rights on e.right = rights.right) as er 
                                         inner join cards on cards.id = er.card)''')
+
+def convert(data: list[tuple]):
+
+
