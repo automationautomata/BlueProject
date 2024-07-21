@@ -28,22 +28,22 @@ class DatabaseABC(ABC):
         pass
 
 class DatabaseConnection(DatabaseABC):
-    def __init__(self, scriptpath: str, name: str) -> None:
-        '''scriptpath - путь к скрипту, создающему бд,
-        name - название БД.'''
+    def __init__(self, scriptpath: str, name: str, dirpath: str = "./") -> None:
+        '''`scriptpath` - путь к скрипту, создающему бд,
+        `name` - название БД, `dirpath` - папка с БД'''
         self.__scriptpath = scriptpath
         self.__name = name
+        self.__dirpath = dirpath
 
     # Нужно понять - надо ли оставлять properties, они нужны для выполнения команд создания БД, 
     # дополнительно к скрипту
-    def establish_connection(self, properties: list[str] = [], dirpath: str = './') -> None:
-        '''Устанавливает соединение c базой в path и, если БД отсутствует,
+    def establish_connection(self, properties: list[str] = []) -> None:
+        '''Устанавливает соединение c базой и, если БД отсутствует,
         то пересоздает ее на основе указанного скрипта.'''
-        path = f"{dirpath}{self.__name}"
+        path = f"{self.__dirpath}{self.__name}"
         if not os.path.isfile(path):
             self._createdatabase_(path)
-        else:
-            self._connection_ = sqllite.connect(path)
+        self._connection_ = sqllite.connect(path)
 
     def _createdatabase_(self, path: str) -> None:
         '''Создает базу данных на основе скрипта.'''
