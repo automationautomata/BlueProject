@@ -1,4 +1,6 @@
-class EntityView:
+from json import JSONEncoder
+
+class EntityView(JSONEncoder):
      def __init__(self, card, isSabotagedCard, cardAddDate, 
                         right, rightName, rightAddDate, rightDelDate,
                         sid, type, entityAddDate, entityDelDate) -> None:
@@ -14,7 +16,7 @@ class EntityView:
         self.entityAddDate = entityAddDate
         self.entityDelDate = entityDelDate
 
-class AccessRuleView:
+class AccessRuleView(JSONEncoder):
      def __init__(self, room, roomName, roomAddDate, roomDeleDate,
                         right, rightName, rightAddDate, rightDelDate, 
                         ruleAddDate, ruleDelDate):
