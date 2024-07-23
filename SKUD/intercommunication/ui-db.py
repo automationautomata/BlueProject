@@ -7,3 +7,5 @@ class DbAnswer:
 def convert(data: list[tuple]) -> list[list]:
     return [list(d) for d in data]
 
+def action_query_map():
+    pass

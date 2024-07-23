@@ -1,7 +1,6 @@
-import os.path
 from abc import ABC, abstractmethod
-import sqlite3 as sqllite
-
+import sqlite3
+import os
 # Шаблон класса, который настраивает базу данных
 # class DatabaseProperties(ABC):
 #     @abstractmethod
@@ -27,6 +26,7 @@ class DatabaseABC(ABC):
     def closeconnection(self) -> None: 
         pass
 
+
 class DatabaseConnection(DatabaseABC):
     def __init__(self, scriptpath: str, name: str, dirpath: str = "./") -> None:
         '''`scriptpath` - путь к скрипту, создающему бд,
@@ -43,11 +43,11 @@ class DatabaseConnection(DatabaseABC):
         path = f"{self.__dirpath}{self.__name}"
         if not os.path.isfile(path):
             self._createdatabase_(path)
-        self._connection_ = sqllite.connect(path)
+        self._connection_ = sqlite3.connect(path)
 
     def _createdatabase_(self, path: str) -> None:
         '''Создает базу данных на основе скрипта.'''
-        self._connection_ = sqllite.connect(path)
+        self._connection_ = sqlite3.connect(path)
         cursor = self._connection_.cursor()
         script = open(self.__scriptpath, "r+")
 
