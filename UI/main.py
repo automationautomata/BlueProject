@@ -6,12 +6,18 @@ from kivy.app import App
 from kivy.config import Config
 from kivy.lang import Builder
 from kivy.core.window import Window
+from kivy.clock import Clock
 
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.boxlayout import BoxLayout
-
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.scrollview import ScrollView
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
+from kivy.uix.button import Button
+
+from kivy.graphics import BorderImage
+from kivy.graphics import Color, Line, Rectangle
 
 from kivy.properties import StringProperty
 from kivy.properties import ListProperty
@@ -25,7 +31,7 @@ Config.write()
 Builder.load_file('MyMain.kv')
 
 class MyLabelTable(Label):
-    table_color = ListProperty([0, 0, 0, .5])
+    table_color = ListProperty([0, 0, 0, 1])
     def on_size(self, *args):
         self.canvas.before.clear()
         with self.canvas.before:
@@ -39,7 +45,7 @@ class MyLabelTable(Label):
 "======================================================================================================================="
 
 class MyLabelHeader(Label):
-    header_color = ListProperty([0, 0, 0, .5])
+    header_color = ListProperty([0, 0, 0, 1])
     def on_size(self, *args):
         self.canvas.before.clear()
         with self.canvas.before:
@@ -47,76 +53,57 @@ class MyLabelHeader(Label):
             Rectangle(pos=self.pos, size=self.size)
             BorderImage(pos=(self.x + 1, self.y + 1),
                 size=(self.width - 2, self.height - 2),
-                border=(10, 10, 10, 10),
+                border=(20, 20, 20, 20),
                 Color=[1, 1, 1, 1])
 
 "======================================================================================================================="
 
-class Table(Widget):
-    table_color = ListProperty([.2, .2, .2, .7])
-    header_color = ListProperty([.2, .2, .7, .5])
-    table_height = NumericProperty(3)
-    table_width = NumericProperty(3)
-    table_columns = NumericProperty(3)
-    table_rows = NumericProperty(5)
-    table_data = []
-    cols_titles = []
+class TableHeader(Widget):
+    _color = ListProperty([.25, .25, .25, .1])
+    _height = NumericProperty(50)
+    _width = NumericProperty(Window.width)
+    _rows = NumericProperty(1)
+    _columns = NumericProperty(6)
+    _titles = ListProperty([])
+    _columns_width = ListProperty([.32, .2, .12, .12, .12, .12])
 
-    def addHeader(self, list):
-        self.cols_titles = list
-        self.Build()
-
-    def addRow(self, list):
-        self.table_data.insert(0, list)
-        self.Build()
-
-    def Build(self):
-        self.grid.clear_widgets()
-        header = 0
-        while self.table_columns > header:
-            text = ""
-            if len(self.cols_titles) > header:
-                text = self.cols_titles[header]
-            h = MyLabelHeader(text=text,
-                size_hint=[db_entities_columns_width[header], .25],
-                header_color=self.header_color)
-            print(h)
-            self.grid.add_widget(h)
-            header += 1
-
-        rowCheck = 0
-        while rowCheck < self.table_rows - 1:
-            columnCheck = 0
-            while columnCheck < self.table_columns:
-                text = ""
-                if len(self.table_data) > rowCheck:
-                    if len(self.table_data[rowCheck]) > columnCheck:
-                        text = self.table_data[rowCheck][columnCheck]
-
-                label = MyLabelTable(text=text,
-                    size_hint=[db_entities_columns_width[columnCheck], .25],
-                    table_color=self.table_color)
-                self.grid.add_widget(label)
-                columnCheck += 1
-            rowCheck += 1
-
-    def __init__(self, **kwargs):
-        super(Table, self).__init__(**kwargs)
-
+    def on_size(self, *args):
         with self.canvas:
-            self.grid = GridLayout(cols=self.table_columns,
-                rows=self.table_rows,
-                size=[self.table_width, self.table_height])
+            self.grid = GridLayout(rows=self._rows,
+                cols=self._columns,
+                size=[self._width, self._height],
+                pos=self.pos)
 
-        for _ in range(self.table_rows):
-            for _ in range(self.table_columns):
-                label = MyLabelTable(text="primary")
-                self.grid.add_widget(label)
+        for col in range(self._columns):
+            label = MyLabelHeader(text=self._titles[col],
+                size_hint=[self._columns_width[col], .25],
+                header_color=self._color)
+            self.grid.add_widget(label)
+
+"======================================================================================================================="
+
+class Table(ScrollView):
+    _color = ListProperty([.4, .8, 1, .1])
+    _height = NumericProperty(650)
+    _width = NumericProperty(Window.width)
+    _rows = NumericProperty(30)
+    _columns = NumericProperty(6)
+    _columns_width = ListProperty([.32, .2, .12, .12, .12, .12])
+    table_data = ListProperty([])
+
+    def load_data(self, grid_link):
+        for _ in range(self._rows):
+            for col in range(self._columns):
+                label = MyLabelTable(text='Аа',
+                    size_hint=[self._columns_width[col], .25],
+                    table_color=self._color)
+                grid_link.add_widget(label)
 
 "======================================================================================================================="
 
 class EntitiesScreen(Screen):
-    pass
+    def on_enter(self, *args):
+        self.ids.entities_table.load_data(self.ids.content)
 
 "======================================================================================================================="
 
@@ -131,7 +118,6 @@ class LogsScreen(Screen):
 "======================================================================================================================="
 
 class TestApp(App):
-
     def build(self):
         # Принять файлы с бд
         sm = ScreenManager()
@@ -140,6 +126,9 @@ class TestApp(App):
         sm.add_widget(LogsScreen(name='logs'))
 
         return sm
+
+    def on_pause(self):
+        return True
 
 if __name__ == '__main__':
     TestApp().run()
