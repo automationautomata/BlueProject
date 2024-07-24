@@ -104,7 +104,6 @@ class ArduinoCommunicator:
 def create_listeners_thread(arduinos: list[ArduinoCommunicator], start_sleep_time: int = 0,  delta: int = 0.001):
     '''Создает поток, асинхронно выполняющий прослушивание портов, `arduinos` - подключенные устройства,
     `start_sleep_time` - время сна первой функции, `delta` - дельта между временем сна двух функций'''
-
     async def ini():
         tasks = [asyncio.create_task(ard.listener(start_sleep_time + ind*delta)) for ind, ard in enumerate(arduinos)]
         await asyncio.gather(*tasks)
