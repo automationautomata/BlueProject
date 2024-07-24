@@ -42,6 +42,16 @@ except:
 # Синхронное общение
 class ArduinoCommunicator:
     '''Класс для отправки данных на ардуино'''
+    def __init__(self, **kwargs) -> None:
+        '''`port` - номер COM порта, `format_send` - функция, превращающая входные данные в строку, 
+        `logger` - сохраняет ошибки и доп.информацию в БД, `baudrate` - частота'''
+        self.connection = serial.Serial(kwargs["port"], kwargs["baudrate"])
+        self.logger = kwargs["logger"]
+        self.handler = kwargs["handler"]
+        self.format_send = kwargs["format_send"]
+        self.endflag = kwargs["endflag"]
+        self.startflag = kwargs["startflag"]
+
     def __init__(self, port: str, handler: Callable[[bytes], None], startflag: str = "{", endflag: str = "}", format_send: Callable[[Any], str] = None, 
                  logger: Logger = None, baudrate: int = 9600) -> None:
         '''`port` - номер COM порта, `format_send` - функция, превращающая входные данные в строку, 
@@ -85,7 +95,8 @@ class ArduinoCommunicator:
                 self.logger.addlog(f"In ArduinoCommunicator.communicate() with input data: {data} ERROR: {NameError}")
             print(NameError)
 
-    def listener(self):
+    async def listener(self) -> None:
+        await asyncio.sleep(0.1)
         while self.connection.is_open:
             #print(ard.connection.in_waiting)
             if self.connection.in_waiting > 0:
@@ -93,26 +104,35 @@ class ArduinoCommunicator:
                 print(start_symb.decode('utf-8'), self.startflag)
                 if start_symb.decode('utf-8') == self.startflag:
                     response = self.connection.read_until(expected=self.endflag.encode())
-                    self.connection.reset_input_buffer()
                     print(self.connection.port, start_symb.decode('utf-8') + response.decode('utf-8'))
                     self.handler(start_symb + response)
-                self.connection.reset_input_buffer()
+            self.connection.reset_input_buffer()
         #ard.connection.reset_input_buffer()
     def close(self):
         # Закрываем порт
         self.connection.close()
-        
+
+def start_multiple_listeners(arduinos: list[ArduinoCommunicator]):
+    def thread_func(): 
+        asyncio.run(arduinos[0].listener())
+    thread = Thread(target=thread_func, daemon=True)
+    return arduinos, thread
+################ ТЕСТ ################
+# ard = ArduinoCommunicator(ARDUINO_PORT[0], handler=lambda x: print(x.decode('utf-8') + "ddd"))
+# ard2 = ArduinoCommunicator('COM1', handler=lambda x: print(x.decode('utf-8')))
+# def ini():
+#     asyncio.gather(ard.listener(), ard2.listener())
+# print(ard.connection.is_open)
+# t = Thread(target=ini, daemon=True)
+# t.start()
+# time.sleep(1)
+# print(ard.connection.is_open)
 ard = ArduinoCommunicator(ARDUINO_PORT[0], handler=lambda x: print(x.decode('utf-8') + "ddd"))
-ard2 = ArduinoCommunicator('COM1', handler=lambda x: print(x.decode('utf-8')))
-
-def ini():
-    asyncio.gather(ard.listener(), ard2.listener())
-print(ard.connection.is_open)
-t = Thread(target=ini, daemon=True)
+fn = handler=lambda x: print(x.decode('utf-8') + "ddd")
+ards, t = start_multiple_listeners([ard])
 t.start()
-time.sleep(1)
-print(ard.connection.is_open)
-
+time.sleep(5)
+print('\\')
 ard.write("{\"hello\": \"COM\"}")
 time.sleep(10)
 # t.join()
