@@ -106,4 +106,22 @@ class Controller:
         db.execute(f'''select * from (((select * from access_rules where {condition}) as e 
                                         inner join rights on e.right = rights.right) as er 
                                             inner join cards on cards.id = er.card)''')
-        
+        ose()
+# print(decoded_response)
+
+#time.sleep(10)
+
+#git config --global core.autocrlf false
+########################################ose()
+# print(decoded_response)
+
+#time.sleep(10)
+
+#git config --global core.autocrlf false
+########################################ose()
+# print(decoded_response)
+
+#time.sleep(10)
+
+#git config --global core.autocrlf false
+########################################
