@@ -30,7 +30,7 @@ void loop() {
   // Проверяем, есть ли данные из Serial порта
   if (Serial.available() > 0) {
     String receivedData = Serial.readString();
-    Serial.println("Получено: dd " + parsjson(receivedData));
+    Serial.print("Получено: dd " + parsjson(receivedData));
   }
   // int randNumber = random(300);
   // if (randNumber >= 200) {

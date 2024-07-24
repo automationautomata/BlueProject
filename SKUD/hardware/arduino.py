@@ -31,14 +31,14 @@ except:
     from ORM.logger import Logger
     from config import ARDUINO_PORT
 
-# def getportsinfo() -> str:
-#     '''Возвращает информацию обо всех COM портах в json-подобном виде'''
-#     ports = list(serial.tools.list_ports.comports())
-#     getinfo = lambda port: '{'+f"\"Port\": \"{port.device}\",\
-#                                  \"Description\": \"{port.description}\", \
-#                                  \"Manufacturer\": \"{port.manufacturer}\""+'}'
-#     return '{'+f"{',\n'.join(getinfo(port) for port in ports)}"+'}'
-
+def getportsinfo() -> str:
+    '''Возвращает информацию обо всех COM портах в json-подобном виде'''
+    ports = list(serial.tools.list_ports.comports())
+    getinfo = lambda port: '{'+f"\"Port\": \"{port.device}\",\
+                                 \"Description\": \"{port.description}\", \
+                                 \"Manufacturer\": \"{port.manufacturer}\""+'}'
+    return '{'+f"{',\n'.join(getinfo(port) for port in ports)}"+'}'
+print(getportsinfo())
 # Синхронное общение
 class ArduinoCommunicator:
     '''Класс для отправки данных на ардуино'''
@@ -52,7 +52,7 @@ class ArduinoCommunicator:
         self.endflag = kwargs["endflag"]
         self.startflag = kwargs["startflag"]
 
-    def __init__(self, port: str, handler: Callable[[bytes], None], startflag: str = "{", endflag: str = "}", format_send: Callable[[Any], str] = None, 
+    def __init__(self, port: str, handler: Callable[[bytes], str], startflag: str = "{", endflag: str = "}", format_send: Callable[[Any], str] = None, 
                  logger: Logger = None, baudrate: int = 9600) -> None:
         '''`port` - номер COM порта, `format_send` - функция, превращающая входные данные в строку, 
         `logger` - сохраняет ошибки и доп.информацию в БД, `baudrate` - частота'''
@@ -95,46 +95,69 @@ class ArduinoCommunicator:
                 self.logger.addlog(f"In ArduinoCommunicator.communicate() with input data: {data} ERROR: {NameError}")
             print(NameError)
 
-    async def listener(self) -> None:
-        await asyncio.sleep(0.1)
+    async def listener(self, timeout):
+        '''Слушает порт, если в буффер не пуст и первый символ совпадает со `startflag`, то читает до `endflag` и отправляет 
+        принятое сообщение в функцию `handler` (она вернет строку, то она будет отправлена как ответ).
+        Если первый символ не совпадает, то буфер отчищается.'''
+    #async def loop():  
         while self.connection.is_open:
-            #print(ard.connection.in_waiting)
+            await asyncio.sleep(timeout)
+            #print(self.connection.port)  
             if self.connection.in_waiting > 0:
                 start_symb = self.connection.read(1)
-                print(start_symb.decode('utf-8'), self.startflag)
+                #print(ard.connection.port, start_symb.decode('utf-8'), ard.startflag)
                 if start_symb.decode('utf-8') == self.startflag:
                     response = self.connection.read_until(expected=self.endflag.encode())
-                    print(self.connection.port, start_symb.decode('utf-8') + response.decode('utf-8'))
-                    self.handler(start_symb + response)
-            self.connection.reset_input_buffer()
+                    #print(ard.connection.port, start_symb.decode('utf-8') + response.decode('utf-8'), start_symb + response)
+                    response = self.handler(start_symb + response)
+                    #response = await self.handler(start_symb + response)
+                    if response:
+                        self.connection.write(response.encode())
+                else: self.connection.reset_input_buffer()
+            
+        #await loop()
         #ard.connection.reset_input_buffer()
     def close(self):
         # Закрываем порт
         self.connection.close()
 
-def start_multiple_listeners(arduinos: list[ArduinoCommunicator]):
-    def thread_func(): 
-        asyncio.run(arduinos[0].listener())
+def create_listeners_thread(arduinos: list[ArduinoCommunicator]):
+    tasks = [asyncio.create_task(ard.listener(0.005)) for ard in arduinos]
+    async def thread_func(): 
+        await asyncio.gather(*tasks)
     thread = Thread(target=thread_func, daemon=True)
-    return arduinos, thread
-################ ТЕСТ ################
-# ard = ArduinoCommunicator(ARDUINO_PORT[0], handler=lambda x: print(x.decode('utf-8') + "ddd"))
-# ard2 = ArduinoCommunicator('COM1', handler=lambda x: print(x.decode('utf-8')))
-# def ini():
-#     asyncio.gather(ard.listener(), ard2.listener())
-# print(ard.connection.is_open)
-# t = Thread(target=ini, daemon=True)
-# t.start()
-# time.sleep(1)
-# print(ard.connection.is_open)
-ard = ArduinoCommunicator(ARDUINO_PORT[0], handler=lambda x: print(x.decode('utf-8') + "ddd"))
-fn = handler=lambda x: print(x.decode('utf-8') + "ddd")
-ards, t = start_multiple_listeners([ard])
+    return thread
+############################### ПРИМЕР ###############################
+ard = ArduinoCommunicator('COM7', handler=lambda x: print(x, 'COM7'))
+ard2 = ArduinoCommunicator('COM6', handler=lambda x: print(x,'COM6'))
+def sts():
+    async def ini():  
+        tasks = []
+        tasks.append(asyncio.create_task(ard.listener(0.005)))
+        tasks.append(asyncio.create_task(ard2.listener(0.004)))
+        # loop = asyncio.get_event_loop()
+        # asyncio.set_event_loop(loop)
+        await asyncio.gather(*tasks)
+    asyncio.run(ini())
+
+print(ard.connection.is_open, ard2.connection.is_open)
+t = Thread(target=sts, daemon=True)
 t.start()
-time.sleep(5)
-print('\\')
-ard.write("{\"hello\": \"COM\"}")
-time.sleep(10)
+ard2.write("{\"hello\": \"6\"}")
+# time.sleep(2)
+ard2.write("{\"hello\": \"6 2\"}")
+ard.write("{\"hello\": \"7\"}")
+time.sleep(15)
+print(ard.connection.is_open, ard2.connection.is_open)
+print()
+# ard = ArduinoCommunicator(ARDUINO_PORT[0], handler=lambda x: print(x.decode('utf-8') + "ddd"))
+# fn = handler=lambda x: print(x.decode('utf-8') + "ddd")
+# ards, t = start_multiple_listeners([ard])
+# t.start()
+# time.sleep(5)
+# print('\\')
+# ard.write("{\"hello\": \"COM\"}")
+# time.sleep(10)
 # t.join()
 ## ТЕСТ
 # ard = ArduinoCommunicator(ARDUINO_PORT[0])
