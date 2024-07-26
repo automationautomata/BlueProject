@@ -1,40 +1,44 @@
 #:import Window kivy.core.window.Window
 
+<ThemeButton>:
+    pos: (Window.width - 30, 0)
+    size: (30, 30)
+
+<ExplorerButton>:
+    background_normal: ''
+    background_color: app.app_color_themes['Explorer buttons'][app.app_color_themes['Current theme']]
+    border: (10, 10, 10, 10)
+
 <EntitiesScreen>:
+    id: entities_screen
     size: Window.size
-    canvas:
-        Color:
-            rgba: (.1, .1, .1, .9)
-        Rectangle:
-            size: self.size
-            pos: self.pos
+    _color: app.app_color_themes['Screen'][app.app_color_themes['Current theme']]
 
     FloatLayout:
         BoxLayout:
+            id: entities_explorer
             orientation: "horizontal"
             size_hint: (None, None)
             size: (Window.width, 50)
             pos: (0, Window.height - 50)
 
-            Button:
+            ExplorerButton:
+                id: go_entites_screen
                 text: "Entities"
-                border: (10, 10, 10, 10)
-                background_color: (.5, .5, .8, .7)
                 on_press: root.manager.current = "entities"
-            Button:
+            ExplorerButton:
+                id: go_access_rules_screen
                 text: 'Access rules'
-                border: (10, 10, 10, 10)
-                background_color: (.5, .5, .8, .7)
                 on_press: root.manager.current = "rules"
-            Button:
+            ExplorerButton:
+                id: go_logs_screen
                 text: 'Logs'
-                border: (10, 10, 10, 10)
-                background_color: (.5, .5, .8, .7)
                 on_press: root.manager.current = "logs"
 
         TableHeader:
+            id: entities_header
             pos: (0, Window.height - 100)
-            _color: (.25, .25, .25, .1)
+            _color: app.app_color_themes['Table header'][app.app_color_themes['Current theme']]
             _height: 50
             _width: Window.width
             _rows: 1
@@ -42,23 +46,40 @@
             _titles: ('Name + sid', 'Card', 'Type', 'Right', 'Creation data', 'Deletion data')
             _columns_width: (.32, .2, .12, .12, .12, .12)
 
-        Table:
+        TableContent:
             id: entities_table
+            pos: (0, 30)
             size_hint: (1, None)
-            size: (self._width, self._height)
+            size: (self._width, self._height - 30)
             bar_width: 10
             do_scroll_x: False
             do_scroll_y: True
 
+            _rows: 5
+            _columns: 6
+            _color: app.app_color_themes['Table content'][app.app_color_themes['Current theme']]
             _columns_width: (.32, .2, .12, .12, .12, .12)
 
             GridLayout:
-                id: content
-                cols: 6
+                id: entities_content
+                rows: entities_table._rows
+                cols: entities_table._columns
                 row_default_height: '20dp'
                 row_force_default: True
                 size_hint_y: None
                 height: self.minimum_height
+
+        Footer:
+            id: footer
+            ThemeButton:
+                id: theme_button
+                border: (10, 10, 10, 10)
+                background_color: app.app_color_themes['Theme button'][app.app_color_themes['Current theme']]
+                text: 'А'
+                on_press: self.switch_theme(root, app.app_color_themes)
+
+
+
 
 
 <RulesScreen>:
