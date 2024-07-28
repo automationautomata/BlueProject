@@ -3,3 +3,5 @@ index.html
 requirements.txt
 app.py
 Dockerfile
+**/.vscode
+**/__pycache__
