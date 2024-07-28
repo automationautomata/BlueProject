@@ -1,34 +1,34 @@
-# import asyncio
-# from websockets.server import serve
+import tornado
 
-# async def echo(websocket):
-#     async for message in websocket:
-#         #print(message)
-#         #print("----------")
-#         await websocket.send("messag    e")
+class SkudQueryHandler(tornado.web.RequestHandler):
+    def initialize(self, actions_router):
+        self.actions_router = actions_router
 
-# async def main():
-#     async with serve(echo, "localhost", 8080):
-#         await asyncio.Future()  # run forever
+    def get(self):
+        data, error = self.actions_router[self.get_body_argument("action")](self.get_body_argument("data"))
+        self.write("{"+f"\"data\": \"{data}\", \"error\": \"{error}\""+"}")
 
-# asyncio.run(main())
+    def post(self):
+        _, error = self.actions_router[self.get_body_argument("action")](self.get_body_argument("data"))
+        self.set_header("Content-Type", "text/plain")
+        self.write("{"+f"\"error\": \"{error}\""+"}")
 
-import json
-import websocket
-from typing import Callable
+    def put(self):
+        _, error = self.actions_router[self.get_body_argument("action")](self.get_body_argument("data"))
+        self.set_header("Content-Type", "text/plain")
+        self.write("{"+f"\"error\": \"{error}\""+"}")
 
-class UiCommunicator:
-    def __init__(self, router: dict[str, Callable[[str], str]], url="ws://localhost:8080") -> None:
-        self.url = url
-        self.router = router
+    def delete(self):
+        _, error = self.actions_router[self.get_body_argument("action")](self.get_body_argument("data"))
+        self.set_header("Content-Type", "text/plain")
+        self.write("{"+f"\"error\": \"{error}\""+"}")
 
-    def connect(self) -> None:
-        self.websocket = websocket.WebSocketApp(self.url, on_message=self.handler)
-        self.websocket.run_forever() 
+class CardControllerWebSocket(tornado.websocket.WebSocketHandler):
+    def open(self):
+        print("WebSocket opened")
 
-    def handler(self, ws: websocket.WebSocketApp, message: str) -> None:
-        print(message)
-        msg = json.loads(message)
-        func = self.router[msg['action']]
-        answer = func(msg['data'])
-        ws.send(answer)
+    def on_message(self, message):
+        self.write_message(u"You said: " + message)
+
+    def on_close(self):
+        print("WebSocket closed")
