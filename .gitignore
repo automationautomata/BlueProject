@@ -3,3 +3,6 @@ index.html
 requirements.txt
 app.py
 Dockerfile
+**/.vscode
+**/__pycache__
+**/DB
