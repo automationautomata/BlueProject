@@ -3,20 +3,17 @@
 <ThemeButton>:
     pos: (Window.width - 30, 0)
     size: (30, 30)
+    background_normal: ''
 
 <ExplorerButton>:
-    background_normal: ''
-    background_color: app.app_color_themes['Explorer buttons'][app.app_color_themes['Current theme']]
     border: (10, 10, 10, 10)
 
 <EntitiesScreen>:
     id: entities_screen
     size: Window.size
-    _color: app.app_color_themes['Screen'][app.app_color_themes['Current theme']]
 
     FloatLayout:
         BoxLayout:
-            id: entities_explorer
             orientation: "horizontal"
             size_hint: (None, None)
             size: (Window.width, 50)
@@ -38,7 +35,6 @@
         TableHeader:
             id: entities_header
             pos: (0, Window.height - 100)
-            _color: app.app_color_themes['Table header'][app.app_color_themes['Current theme']]
             _height: 50
             _width: Window.width
             _rows: 1
@@ -57,7 +53,6 @@
 
             _rows: 5
             _columns: 6
-            _color: app.app_color_themes['Table content'][app.app_color_themes['Current theme']]
             _columns_width: (.32, .2, .12, .12, .12, .12)
 
             GridLayout:
@@ -76,10 +71,7 @@
                 border: (10, 10, 10, 10)
                 background_color: app.app_color_themes['Theme button'][app.app_color_themes['Current theme']]
                 text: 'А'
-                on_press: self.switch_theme(root, app.app_color_themes)
-
-
-
+                on_press: self.switch_theme(root)
 
 
 <RulesScreen>:
