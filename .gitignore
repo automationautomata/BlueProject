@@ -5,3 +5,4 @@ app.py
 Dockerfile
 **/.vscode
 **/__pycache__
+**/DB
