@@ -1,0 +1,6 @@
+CREATE TABLE history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    port TEXT NOT NULL,
+    message TEXT NOT NULL,
+    pass_time TEXT NOT NULL
+);

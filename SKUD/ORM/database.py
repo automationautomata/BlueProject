@@ -20,10 +20,10 @@ class DatabaseABC(ABC):
     def _createdatabase_(self, path: str) -> None: 
         pass
     @abstractmethod
-    def execute(self, command: str, *params) -> None: 
+    def execute_query(self, command: str, *params) -> None: 
         pass
     @abstractmethod
-    def closeconnection(self) -> None: 
+    def close(self) -> None: 
         pass
 
 
@@ -34,36 +34,45 @@ class DatabaseConnection(DatabaseABC):
         self.__scriptpath = scriptpath
         self.__name = name
         self.__dirpath = dirpath
+        self._connection_ = None
 
-    # Нужно понять - надо ли оставлять properties, они нужны для выполнения команд создания БД, 
-    # дополнительно к скрипту
-    def establish_connection(self, properties: list[str] = []) -> None:
+    def establish_connection(self) -> None:
         '''Устанавливает соединение c базой и, если БД отсутствует,
         то пересоздает ее на основе указанного скрипта.'''
         path = f"{self.__dirpath}{self.__name}"
-        if not os.path.isfile(path):
+        if not os.path.exists(path):
             self._createdatabase_(path)
-        self._connection_ = sqlite3.connect(path)
+        elif not self._connection_: 
+            self._connection_ = sqlite3.connect(path)
+        else: 
+            try: 
+                self._connection_.cursor()
+            except: 
+                self._connection_ = sqlite3.connect(path)
 
     def _createdatabase_(self, path: str) -> None:
         '''Создает базу данных на основе скрипта.'''
         self._connection_ = sqlite3.connect(path)
         cursor = self._connection_.cursor()
-        script = open(self.__scriptpath, "r+")
 
-        # Создаем базу
-        cursor.executescript(script)
-        # for property in properties:
-        #     cursor.execute(statsment)
+        with open(self.__scriptpath, "r+") as scriptfile:
+            script = scriptfile.read()
+            cursor.executescript(script)
+            self._connection_.commit()
+
+    def execute_query(self, command: str, *params) -> list[tuple]: 
+        '''Выполняет указанную команду command с параметрами params (см. документацию SQLite).'''
+        cursor = self._connection_.cursor()
+        result = cursor.execute(command, params).fetchall()
         self._connection_.commit()
-
-    def execute(self, command: str, *params) -> list[tuple]: 
+        return result
+    
+    def execute____(self, command: str, *params) -> list[tuple]: 
         '''Выполняет указанную команду command с параметрами params (см. документацию SQLite).'''
         cursor = self._connection_.cursor()
         result = cursor.execute(command, params)
         self._connection_.commit()
-        return result
-    
+
     def close(self) -> None:
-        '''Закрывает соединение с базой.'''
+        '''Закрывает соединение с БД'''
         self._connection_.close()

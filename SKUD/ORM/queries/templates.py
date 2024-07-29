@@ -16,4 +16,5 @@ def query_for_table(table: str, cols: list[str], interval: tuple[int, int], orde
 def condition_query(table: str, cols: list[str], condition: str):
     return f"SELECT {str(cols)[1:-1]} FROM {table} WHERE {condition}"
 
-print(str([0, 1])[1:-1])
+def sort_query(table: str):
+    pass
