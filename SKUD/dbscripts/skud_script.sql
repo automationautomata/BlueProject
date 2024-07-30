@@ -3,7 +3,8 @@
 CREATE TABLE cards (
     id VARCHAR(4) PRIMARY KEY,
     isSabotaged VARCHAR(1) NOT NULL,
-    date_time TEXT NOT NULL
+    date_time_begin TEXT NOT NULL,
+    date_time_end TEXT
 );
 -- 0 - не саботирована, 1 - саботирована 
 CREATE TABLE rooms (
@@ -42,36 +43,36 @@ CREATE TABLE entities (
 
 CREATE VIEW entities_view 
 AS select card, 
-          isSabotaged as isSabotagedCard,  
-          card.date_time as cardAddDate, 
-          right, 
-          right.name as rightName, 
-          right.date_time_begin as rightAddDate,
-          right.date_time_end as rightDelDate, 
-          sid,
-          type,
-          date_time_begin as entityAddDate,
-          date_time_end as entityDelDate
+          cards.isSabotaged as isSabotagedCard,  
+          cards.date_time_begin as cardAddDate, 
+          cards.date_time_end as cardDelDate, 
+          entities.right, 
+          rights.name as rightName, 
+          rights.date_time_begin as rightAddDate,
+          rights.date_time_end as rightDelDate, 
+          entities.sid,
+          entities.type,
+          entities.date_time_begin as entityAddDate,
+          entities.date_time_end as entityDelDate
             from entities inner join cards on cards.id = entities.card    
-                        inner join rights on entities.right = rights.right;
+                        inner join rights on entities.right = rights.id;
 
 CREATE VIEW access_rules_view 
-AS select room, 
-          room.name as roomName,  
-          room.date_time_begin as roomAddDate, 
-          room.date_time_end as roomDeleDate, 
-          right, 
-          right.name as rightName, 
-          right.date_time_begin as rightAddDate,
-          right.date_time_end as rightDelDate, 
-          date_time_begin as ruleAddDate,
-          date_time_end as ruleDelDate
-            from entities inner join rooms on room.id = access_rules.room    
-                        inner join rights on access_rules.right = rights.right;
+AS select access_rules.room, 
+          rooms.name as roomName,  
+          rooms.date_time_begin as roomAddDate, 
+          access_rules.right, 
+          rights.name as rightName, 
+          rights.date_time_begin as rightAddDate,
+          rights.date_time_end as rightDelDate, 
+          access_rules.date_time_begin as ruleAddDate,
+          access_rules.date_time_end as ruleDelDate
+            from entities inner join rooms on rooms.id = access_rules.room    
+                        inner join rights on access_rules.right = rights.id;
 
 --------------------------------------------------------------------------------    
 
-INSERT into cards (id, isSabotaged, date_time) values (12, 0, strftime('%Y-%m-%d %H:%M:%S', datetime('now'))), 
+INSERT into cards (id, isSabotaged, date_time_begin) values (12, 0, strftime('%Y-%m-%d %H:%M:%S', datetime('now'))), 
                                                       (15, 0, strftime('%Y-%m-%d %H:%M:%S', datetime('now')));             
 INSERT into rooms (name, date_time) values ('office', strftime('%Y-%m-%d %H:%M:%S', datetime('now'))), 
                                            ('work',   strftime('%Y-%m-%d %H:%M:%S', datetime('now')));
