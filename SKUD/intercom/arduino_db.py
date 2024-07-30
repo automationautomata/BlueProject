@@ -2,7 +2,7 @@ import copy
 import json
 
 from ORM.database import DatabaseConnection
-from ORM.entities.tables import HistoryRow
+from ORM.entities.tables import VisitsHistory
 from ORM.loggers import VisitLogger, Logger
 from hardware.tools import ardions_configuring
 
@@ -29,7 +29,7 @@ class AccessController:
             if msg["type"] == "pass":
                 kwargs["visits_db"].establish_connection()
                 if "key" in msg.keys():
-                    b = kwargs["visits_db"].addrow(HistoryRow(port, msg["key"]))
+                    b = kwargs["visits_db"].addrow(VisitsHistory(port, msg["key"]))
                     print(b)
         except NameError:
             if kwargs["logger"]:

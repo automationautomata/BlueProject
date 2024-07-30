@@ -1,6 +1,6 @@
 from datetime import datetime
 
-class HistoryRow:
+class VisitsHistory:
     def __init__(self, port: str, message: str):
         self.port = port
         self.message = message

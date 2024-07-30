@@ -1,5 +1,5 @@
 from ORM.database import DatabaseConnection
-from ORM.entities.tables import HistoryRow
+from ORM.entities.tables import VisitsHistory
 from datetime import datetime
 
 class Logger(DatabaseConnection):
@@ -24,9 +24,9 @@ class VisitLogger(DatabaseConnection):
     def __init__(self, name: str, dirpath: str = "./") -> None:
         super().__init__(VisitLogger.__scriptpath, name, dirpath)
 
-    def addrow(self, message: HistoryRow):
+    def addrow(self, message: VisitsHistory):
         cursor = self._connection_.cursor()
-        sql = "INSERT INTO history (port, message, pass_time) VALUES (?,?,?);"
+        sql = "INSERT INTO visits_history (port, message, pass_time) VALUES (?,?,?);"
         data = (message.port, message.message, message.pass_time)
         try: 
             cursor.execute(sql, data)
@@ -35,4 +35,6 @@ class VisitLogger(DatabaseConnection):
         except NameError: 
             print("ERR", NameError)
             return False
+    
+
     
