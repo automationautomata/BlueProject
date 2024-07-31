@@ -14,10 +14,10 @@ class EntityView(JSONEncoder):
         self.type = kwargs["type"]
         self.entityAddDate = kwargs["entityAddDate"]
         self.entityDelDate = kwargs["entityDelDate"]
-        
      def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, 
                          sort_keys=True, indent=4)
+     
 class AccessRuleView(JSONEncoder):
      def __init__(self, room, roomName, roomAddDate, roomDeleDate,
                         right, rightName, rightAddDate, rightDelDate, 

@@ -2,6 +2,7 @@ import json
 from typing import Any, Callable
 import tornado
 from threading import Thread
+
 class Answer:
     def __init__(self, data: Any, error: str) -> None:
         self.data = data
@@ -17,7 +18,7 @@ class SkudQueryHandler(tornado.web.RequestHandler):
         answer = self.actions[self.get_body_argument("action")](self.get_body_argument("data"))
         print(answer.toJSON())
         self.write(answer.toJSON())
-        
+
     def post(self) -> None:
         answer = self.actions[self.get_body_argument("action")](self.get_body_argument("data"))
         self.set_header("Content-Type", "text/plain")
