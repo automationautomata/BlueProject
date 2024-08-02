@@ -1,12 +1,14 @@
+from abc import ABC
 import json
 from typing import Any, Callable
 
 from ORM.database import DatabaseConnection
 from ORM.loggers import Logger
 from ORM.queries.templates import query_for_table
+from remote.tools import Actions
 from remote.ui import Answer
 
-class UiController:
+class UiSkudController(Actions):
     def __init__(self, skud_db: DatabaseConnection, logger: Logger = None) -> None:
         self.skud_db = skud_db
         self.skud_db.establish_connection()
@@ -49,3 +51,9 @@ class UiController:
             if self.logger:
                 self.logger.addlog(f"In UiController.__tablequery__ with table = {table} and data = {data} ERROR: {NameError}")
             return Answer([], str(NameError))
+
+class UiVisitsController(Actions):
+    def action_query_map(self) -> dict[str, Callable]:
+        actions = {"entities query": self.entity_query, 
+                   "accessrules query": self.accessrules_query}
+        return actions

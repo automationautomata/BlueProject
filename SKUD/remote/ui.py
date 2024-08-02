@@ -33,10 +33,3 @@ class SkudQueryHandler(tornado.web.RequestHandler):
         answer = self.actions[self.get_body_argument("action")](self.get_body_argument("data"))
         self.set_header("Content-Type", "text/plain")
         self.write(answer.toJSON())
-
-def create_tornado_server(actions, port: int, isdaemon: bool = True) -> tuple[Thread, tornado.web.Application]:
-    app = tornado.web.Application([
-        (r"/", SkudQueryHandler, dict(actions=actions))
-    ])
-    app.listen(port)
-    return Thread(target=tornado.ioloop.IOLoop.current().start, daemon=isdaemon), app

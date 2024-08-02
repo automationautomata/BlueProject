@@ -1,12 +1,7 @@
 from abc import ABC, abstractmethod
 import sqlite3
 import os
-# Шаблон класса, который настраивает базу данных
-# class DatabaseProperties(ABC):
-#     @abstractmethod
-#     def useproperties(self, cursor: sqllite.Cursor) -> None: 
-#         pass
-    
+
 # Шаблон класса для установки соединений с БД
 class DatabaseABC(ABC):
     @abstractmethod
@@ -67,7 +62,7 @@ class DatabaseConnection(DatabaseABC):
         self._connection_.commit()
         return result
     
-    def execute____(self, command: str, *params) -> list[tuple]: 
+    def execute(self, command: str, *params) -> list[tuple]: 
         '''Выполняет указанную команду command с параметрами params (см. документацию SQLite).'''
         cursor = self._connection_.cursor()
         result = cursor.execute(command, params)

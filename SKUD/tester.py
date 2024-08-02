@@ -9,6 +9,7 @@
 
 import json
 from threading import Thread
+from tornado.websocket import WebSocketHandler
 import time
 from typing import Any, Callable
 import tornado
@@ -41,26 +42,28 @@ class SkudQueryHandler(tornado.web.RequestHandler):
         self.set_header("Content-Type", "text/plain")
         self.write(answer.toJSON())
 
-# class VisitsWebSocket(tornado.websocket.WebSocketHandler):
-#     def initialize(self, actions):
-#         self.actions = actions
-#     def open(self):
-#         print("WebSocket opened")
+class VisitsWebSocket(WebSocketHandler):
+    def initialize(self, actions):
+        self.actions = actions
 
-#     def on_message(self, message):
-#         self.write_message(u"You said: " + message)
+    def open(self):
+        print("WebSocket opened")
 
-#     def on_close(self):
-#         print("WebSocket closed")
+    def on_message(self, message):
+        self.write_message(u"You said: " + message)
+
+    def on_close(self):
+        print("WebSocket closed")
+
+
 skud_db = DatabaseConnection(scriptpath=".\\dbscripts\\skud_script.sql",
                              name="SKUD", dirpath=".\\DB\\")
 ui = UiController(skud_db=skud_db)
 app = tornado.web.Application([
-    (r"/", SkudQueryHandler, dict(actions=ui.action_query_map()))
+    (r"/", SkudQueryHandler, dict(actions=ui.action_query_map())),
+    (r"/", VisitsWebSocket, dict(actions=ui.action_query_map()))
 ])
 app.listen(8080)
-def st():
-    tornado.ioloop.IOLoop.current().start()
 Thread(target=tornado.ioloop.IOLoop.current().start, daemon=True).start()
 
 time.sleep(2)

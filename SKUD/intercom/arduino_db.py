@@ -9,7 +9,8 @@ from hardware.tools import ardions_configuring
 class AccessController:
     '''Класс для управления несолькими ардуино и взаимодействия с БД'''
     def __init__(self, skud: DatabaseConnection, ports: list[str], visits_db: VisitLogger, logger: Logger = None) -> None:
-        '''`ports` - список портов, к которым подключены устройства, `visits_db` - класс для соединения с БД инофрмации, полученной от устройств, 
+        '''`skud` - класс для соединения с БД скуда, `ports` - список портов, к которым подключены устройства, 
+        `visits_db` - класс для соединения с БД инофрмации, полученной от устройств, 
         `logger` - класс для сохранения ошибок и дополнительной информации'''
         self.skud = skud
         self.skud.establish_connection()
@@ -37,12 +38,13 @@ class AccessController:
             print(NameError)
 
     def distribute_keys(self, room_port: dict[int, str]) -> None:
+        '''Распределяет ключи по устройствам. `room_port` - словарь, где ключ - комната, а занчение - название порта'''
         sql = f'''SELECT entities.card, access_rules.room from entities INNER JOIN access_rules 
                                         ON entities.right = access_rules.right
                                                     WHERE entities.date_time_end IS NULL 
                                                         AND access_rules.date_time_end IS NULL;'''
         cards = self.skud.execute_query(sql)
-        print("distribute_keys", cards)
+        #print("distribute_keys", cards)
         for room, port in room_port.items():
             msg = list(map(lambda row: row[0], filter(lambda row: row[1] == room, cards)))
             self.arduinos[port].write('{'+f"\"cards\": \"{msg}\""+'}')

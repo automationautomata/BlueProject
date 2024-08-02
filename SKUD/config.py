@@ -1,9 +1,12 @@
 # Глобальные константы для СКУДа
 
-DB_NAME = "SKUDdb"
-'''Название базы данных'''
+DB_NAME = "SKUD"
+'''Название базы данных СКУДа'''
 
-SCRIPT_PATH = "E:\\BlueProject\\sskudscript.sql"
+DB_DIR = ".\\DB\\"
+'''Путь к папке с БД'''
+
+SKUD_SCRIPT_PATH = ".\\dbscripts\\skud_script.sql"
 '''Путь к скрипту, создающему базу данных'''
 
 ROOT_DIR = "E:\\BlueProject\\"
