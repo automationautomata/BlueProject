@@ -23,7 +23,7 @@ ac = AccessController(skud=skud_db, ports=ARDUINO_PORTS,
 # Запуск и нстройка работы сервера
 ac.start(ROOM_PORT_MAP)
 time.sleep(2)
-print(visits_db.execute_query("SELECT * FROM visits_history;"))
+print('\n'.join(visits_db.execute_query("SELECT * FROM visits_history;")))
 
 skud_db = DatabaseConnection(scriptpath="SKUD_SCRIPT_PATH",
                              name=DB_NAME, dirpath=DB_DIR)

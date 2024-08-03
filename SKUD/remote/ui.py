@@ -1,6 +1,7 @@
 import json
 from typing import Any, Callable
 import tornado
+from tornado.websocket import WebSocketHandler
 from threading import Thread
 
 class Answer:
@@ -33,3 +34,16 @@ class SkudQueryHandler(tornado.web.RequestHandler):
         answer = self.actions[self.get_body_argument("action")](self.get_body_argument("data"))
         self.set_header("Content-Type", "text/plain")
         self.write(answer.toJSON())
+
+class VisitsWebSocket(WebSocketHandler):
+    def initialize(self, actions: dict[str, Callable[[str], Answer]]) -> None:
+        self.actions = actions
+
+    def open(self):
+        print("WebSocket opened")
+
+    def on_message(self, message):
+        self.write_message(u"You said: " + message)
+
+    def on_close(self):
+        print("WebSocket closed")

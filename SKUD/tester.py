@@ -8,14 +8,17 @@
 #     connection.commit()
 
 import json
+import sys
+import os
 from threading import Thread
 from tornado.websocket import WebSocketHandler
 import time
 from typing import Any, Callable
 import tornado
+sys.path.append(os.getcwd())
 
 from ORM.database import DatabaseConnection
-from intercom.ui_db import UiController
+from intercom.ui_db import UiSkudController
 from remote.ui import Answer
 
 
@@ -58,12 +61,13 @@ class VisitsWebSocket(WebSocketHandler):
 
 skud_db = DatabaseConnection(scriptpath=".\\dbscripts\\skud_script.sql",
                              name="SKUD", dirpath=".\\DB\\")
-ui = UiController(skud_db=skud_db)
+ui = UiSkudController(skud_db=skud_db)
 app = tornado.web.Application([
     (r"/", SkudQueryHandler, dict(actions=ui.action_query_map())),
-    (r"/", VisitsWebSocket, dict(actions=ui.action_query_map()))
+    (r"/wss", VisitsWebSocket, dict(actions=None))
 ])
 app.listen(8080)
+app.get_handler_delegate
 Thread(target=tornado.ioloop.IOLoop.current().start, daemon=True).start()
 
 time.sleep(2)
