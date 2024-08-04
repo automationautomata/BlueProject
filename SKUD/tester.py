@@ -8,17 +8,13 @@
 #     connection.commit()
 
 import json
-import sys
-import os
 from threading import Thread
-from tornado.websocket import WebSocketHandler
 import time
 from typing import Any, Callable
 import tornado
-sys.path.append(os.getcwd())
 
 from ORM.database import DatabaseConnection
-from intercom.ui_db import UiSkudController
+from intercom.ui_db import UiController
 from remote.ui import Answer
 
 
@@ -45,29 +41,26 @@ class SkudQueryHandler(tornado.web.RequestHandler):
         self.set_header("Content-Type", "text/plain")
         self.write(answer.toJSON())
 
-class VisitsWebSocket(WebSocketHandler):
-    def initialize(self, actions):
-        self.actions = actions
+# class VisitsWebSocket(tornado.websocket.WebSocketHandler):
+#     def initialize(self, actions):
+#         self.actions = actions
+#     def open(self):
+#         print("WebSocket opened")
 
-    def open(self):
-        print("WebSocket opened")
+#     def on_message(self, message):
+#         self.write_message(u"You said: " + message)
 
-    def on_message(self, message):
-        self.write_message(u"You said: " + message)
-
-    def on_close(self):
-        print("WebSocket closed")
-
-
+#     def on_close(self):
+#         print("WebSocket closed")
 skud_db = DatabaseConnection(scriptpath=".\\dbscripts\\skud_script.sql",
                              name="SKUD", dirpath=".\\DB\\")
-ui = UiSkudController(skud_db=skud_db)
+ui = UiController(skud_db=skud_db)
 app = tornado.web.Application([
-    (r"/", SkudQueryHandler, dict(actions=ui.action_query_map())),
-    (r"/wss", VisitsWebSocket, dict(actions=None))
+    (r"/", SkudQueryHandler, dict(actions=ui.action_query_map()))
 ])
 app.listen(8080)
-app.get_handler_delegate
+def st():
+    tornado.ioloop.IOLoop.current().start()
 Thread(target=tornado.ioloop.IOLoop.current().start, daemon=True).start()
 
 time.sleep(2)
