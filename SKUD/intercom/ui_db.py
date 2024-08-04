@@ -2,7 +2,7 @@ import json
 from typing import Any, Callable
 
 from ORM.database import DatabaseConnection
-from ORM.loggers import Logger
+from ORM.loggers import Logger, VisitLogger
 from ORM.queries.templates import query_for_table
 from remote.ui import Answer
 
@@ -47,5 +47,23 @@ class UiController:
             return Answer(self.rows_to_dicts(col_names, res), "")
         except NameError:
             if self.logger:
+                self.logger.establish_connection()
                 self.logger.addlog(f"In UiController.__tablequery__ with table = {table} and data = {data} ERROR: {NameError}")
             return Answer([], str(NameError))
+
+class AuthenticationController:
+    __tokens = set()
+    def __init__(self, visits_db: VisitLogger, skud_db: DatabaseConnection) -> None:
+        self.visits_db = visits_db
+        self.visits_db.establish_connection()
+        self.skud_db = skud_db
+        self.skud_db.establish_connection()
+    
+    def istoken(self, token: int) -> bool:
+        return token in type(self).__tokens
+
+    def verificator(self, data):  
+        msg = json.loads(data)
+        sql = "SELECT * FROM "
+        self.skud_db.execute_query(msg["key"])
+        self.skud_db.addrow()
