@@ -9,6 +9,8 @@ class Answer:
     def toJSON(self) -> str:
         return json.dumps(self.__dict__)
     
+tokens = set()
+
 class SkudQueryHandler(tornado.web.RequestHandler):
     def initialize(self, actions: dict[str, Callable[[str], Answer]]) -> None:
         self.actions = actions
