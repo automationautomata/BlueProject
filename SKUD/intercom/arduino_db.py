@@ -30,7 +30,7 @@ class AccessController:
             if msg["type"] == "pass":
                 kwargs["visits_db"].establish_connection()
                 if "key" in msg.keys():
-                    b = kwargs["visits_db"].addrow(VisitsHistory(port, msg["key"]))
+                    b = kwargs["visits_db"].addvisit(VisitsHistory(port, msg["key"]))
                     print(b)
         except NameError:
             if kwargs["logger"]:

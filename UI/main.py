@@ -66,7 +66,7 @@ class Table(Widget):
         self.cols_titles = list
         self.Build()
 
-    def addRow(self, list):
+    def addvisit(self, list):
         self.table_data.insert(0, list)
         self.Build()
 

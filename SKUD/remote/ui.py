@@ -1,43 +1,11 @@
 import json
-from typing import Any, Callable
+from typing import Callable
 import tornado
-from threading import Thread
-class Answer:
-    def __init__(self, data: Any, error: str) -> None:
-        self.data = data
-        self.error = error
-    def toJSON(self) -> str:
-        return json.dumps(self.__dict__)
-    
-tokens = set()
+from tornado.websocket import WebSocketHandler
 
-class SkudQueryHandler(tornado.web.RequestHandler):
-    def initialize(self, actions: dict[str, Callable[[str], Answer]]) -> None:
-        self.actions = actions
-        
-    def get(self) -> None:
-        if self.get_body_argument("token") in tokens:
-            answer = self.actions[self.get_body_argument("action")](self.get_body_argument("data"))
-            print(answer.toJSON())
-            self.write(answer.toJSON())
-        
-    def post(self) -> None:
-        if self.get_body_argument("token") in tokens:
-            answer = self.actions[self.get_body_argument("action")](self.get_body_argument("data"))
-            self.set_header("Content-Type", "text/plain")
-            self.write(answer.toJSON())
+from general.singleton import Singleton
+from remote.tools import Actions, Answer
 
-    def put(self) -> None:
-        if self.get_body_argument("token") in tokens:
-            answer = self.actions[self.get_body_argument("action")](self.get_body_argument("data"))
-            self.set_header("Content-Type", "text/plain")
-            self.write(answer.toJSON())
-
-    def delete(self) -> None:
-        if self.get_body_argument("token") in tokens:
-            answer = self.actions[self.get_body_argument("action")](self.get_body_argument("data"))
-            self.set_header("Content-Type", "text/plain")
-            self.write(answer.toJSON())
 
 class AuthenticationHandler(tornado.web.RequestHandler):
     def initialize(self, verificator: Callable[[str], Answer]):
@@ -47,11 +15,51 @@ class AuthenticationHandler(tornado.web.RequestHandler):
         answer = self.verificator(self.get_body_argument("auth"))
         self.write(answer.toJSON())
 
-##        random.randint(a, b)
 
-def create_tornado_server(actions, port: int, isdaemon: bool = True) -> tuple[Thread, tornado.web.Application]:
-    app = tornado.web.Application([
-        (r"/", SkudQueryHandler, dict(actions=actions))
-    ])
-    app.listen(port)
-    return Thread(target=tornado.ioloop.IOLoop.current().start, daemon=isdaemon), app
+class SkudQueryHandler(tornado.web.RequestHandler):
+    def initialize(self, action: Actions) -> None:
+        self.actions = action.action_query_map()
+        self.verify = action.verify()
+        
+    def get(self) -> None:
+        if self.verify(self.get_body_argument("auth")):
+            answer = self.actions[self.get_body_argument("action")](self.get_body_argument("data"))
+            print(answer.toJSON())
+            self.write(answer.toJSON())
+        
+    def post(self) -> None:
+        if self.verify(self.get_body_argument("auth")):
+            answer = self.actions[self.get_body_argument("action")](self.get_body_argument("data"))
+            self.set_header("Content-Type", "text/plain")
+            self.write(answer.toJSON())
+
+    def put(self) -> None:
+        if self.verify(self.get_body_argument("auth")):
+            answer = self.actions[self.get_body_argument("action")](self.get_body_argument("data"))
+            self.set_header("Content-Type", "text/plain")
+            self.write(answer.toJSON())
+
+    def delete(self) -> None:
+        if self.verify(self.get_body_argument("auth")):
+            answer = self.actions[self.get_body_argument("action")](self.get_body_argument("data"))
+            self.set_header("Content-Type", "text/plain")
+            self.write(answer.toJSON())
+
+class VisitsWebsoket(WebSocketHandler):
+    def initialize(self, action: Actions) -> None:
+        self.actions = action.action_query_map()
+        self.verify = action.verify()
+    
+    def open(self):
+        self.id = self.clients.add(self)
+        print("WebSocket opened")
+
+    def on_message(self, data):
+        msg = json.loads(data)
+        if self.veryfy(msg["token"]):
+            self.actions[msg["action"]]
+        self.write_message(f"You said: {data}")
+
+    def on_close(self):
+        self.clients.remove(self.id)
+        print("WebSocket closed")

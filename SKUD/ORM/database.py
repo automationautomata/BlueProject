@@ -67,7 +67,12 @@ class DatabaseConnection(DatabaseABC):
         cursor = self._connection_.cursor()
         result = cursor.execute(command, params)
         self._connection_.commit()
+        
+    def table_cols(self, table: str):
+        return list(map(lambda row: row[0], 
+                                self.skud_db.execute_query(f"SELECT c.name FROM pragma_table_info('{table}') as c;")))
 
     def close(self) -> None:
         '''Закрывает соединение с БД'''
         self._connection_.close()
+    
