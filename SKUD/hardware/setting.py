@@ -26,7 +26,7 @@ def create_listeners_thread(arduinos: list[ArduinoCommunicator],
     thread = Thread(target=lambda:asyncio.run(ini()), daemon=isdaemon)
     return thread
 
-def ardions_configuring(ports: list[str], 
+def arduions_configuring(ports: list[str], 
                         handler: Callable[[bytes], str], handler_kwargs=None) -> tuple[Thread, dict[str, ArduinoCommunicator]]: 
     '''Настройка группы адруино, подключенных к портам из `ports` и с обработчиком входных данных `handler`,
     `handler_kwargs` - его аргументы'''

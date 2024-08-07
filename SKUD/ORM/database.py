@@ -71,6 +71,13 @@ class DatabaseConnection(DatabaseABC):
     def table_cols(self, table: str):
         return list(map(lambda row: row[0], 
                                 self.skud_db.execute_query(f"SELECT c.name FROM pragma_table_info('{table}') as c;")))
+    
+    def rows_to_dicts(self, col_names: list[str], rows: list[tuple]) -> list[dict]:
+        data = []
+        for row in rows:
+            dict_row = {col: val for val, col in zip(row, col_names)}
+            data.append(dict_row)
+        return data
 
     def close(self) -> None:
         '''Закрывает соединение с БД'''

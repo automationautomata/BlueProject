@@ -3,8 +3,7 @@ from typing import Callable
 import tornado
 from tornado.websocket import WebSocketHandler
 
-from general.singleton import Singleton
-from remote.tools import Actions, Answer
+from remote.tools import Actions, Answer, WebsoketClients
 
 
 class AuthenticationHandler(tornado.web.RequestHandler):
@@ -16,7 +15,7 @@ class AuthenticationHandler(tornado.web.RequestHandler):
         self.write(answer.toJSON())
 
 
-class SkudQueryHandler(tornado.web.RequestHandler):
+class QueryHandler(tornado.web.RequestHandler):
     def initialize(self, action: Actions) -> None:
         self.actions = action.action_query_map()
         self.verify = action.verify()
@@ -45,10 +44,12 @@ class SkudQueryHandler(tornado.web.RequestHandler):
             self.set_header("Content-Type", "text/plain")
             self.write(answer.toJSON())
 
-class VisitsWebsoket(WebSocketHandler):
+
+class Websoket(WebSocketHandler):
     def initialize(self, action: Actions) -> None:
         self.actions = action.action_query_map()
         self.verify = action.verify()
+        self.clients = WebsoketClients()
     
     def open(self):
         self.id = self.clients.add(self)

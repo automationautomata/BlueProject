@@ -1,5 +1,5 @@
 from ORM.database import DatabaseConnection
-from ORM.entities.tables import VisitsHistory
+from ORM.entities.tables import RemoteSessions, VisitsHistory
 from datetime import datetime
 
 class Logger(DatabaseConnection):
@@ -43,6 +43,17 @@ class VisitLogger(DatabaseConnection):
         except NameError: 
             print("ERR", NameError)
             return False
-    
+        
+    def addsession(self, row: RemoteSessions):
+        cursor = self._connection_.cursor()
+        sql = "INSERT INTO remote_sessions (address, token, event, message, sign_in_time) VALUES (?,?,?);"
+        data = (row.address, row.token, row.event, row.message, row.sign_in_time)
+        try: 
+            cursor.execute(sql, data)
+            self._connection_.commit()
+            return True
+        except NameError: 
+            print("ERR", NameError)
+            return False
 
     

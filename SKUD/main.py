@@ -8,7 +8,7 @@ sys.path.append(os.getcwd())
 
 from ORM.database import DatabaseConnection
 from ORM.loggers import VisitLogger
-from config import ARDUINO_PORTS, ROOM_PORT_MAP, URL, \
+from general.config import ARDUINO_PORTS, ROOM_PORT_MAP, URL, \
                    SKUD_SCRIPT_PATH, DB_NAME, DB_DIR
 from intercom.arduino_db import AccessController
 

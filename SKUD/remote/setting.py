@@ -4,7 +4,7 @@ from typing import Callable
 import tornado
 
 from SKUD.remote.tools import Actions, Answer
-from SKUD.remote.ui import AuthenticationHandler, SkudQueryHandler, VisitsWebsoket
+from SKUD.remote.ui import AuthenticationHandler, QueryHandler, Websoket
 
 
 def create_tornado_server(port: int, 
@@ -19,8 +19,9 @@ def create_tornado_server(port: int,
     `isdaemon` - подчиненный ли поток по отношению к главному.'''
     app = tornado.web.Application([
         (r"/", AuthenticationHandler, dict(verificator=auth)),
-        (r"/ui", SkudQueryHandler, dict(action=skud)),
-        (r"/wss", VisitsWebsoket, dict(actions=visits))])
+        (r"/ui", QueryHandler, dict(action=skud)),
+        (r"/wss", Websoket, dict(actions=visits))
+    ])
     
     app.listen(port)
     return Thread(target=tornado.ioloop.IOLoop.current().start, daemon=isdaemon), app

@@ -19,5 +19,3 @@ def condition_query(table: str, cols: list[str], condition: str):
 
 def sort_query(table: str):
     pass
-            col_names = list(map(lambda row: row[0], 
-                                self.skud_db.execute_query(f"SELECT c.name FROM pragma_table_info('{table}') as c;")))

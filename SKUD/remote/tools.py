@@ -1,7 +1,7 @@
 import json
 from abc import ABC
 from tornado.websocket import WebSocketHandler
-from typing import Any, Callable
+from typing import Any, Callable, Protocol
     
 from general.singleton import Singleton
 
@@ -13,7 +13,7 @@ class Answer:
     def toJSON(self) -> str:
         return json.dumps(self.__dict__)
     
-class Actions(ABC):
+class Actions(Protocol):
     '''Интерфейс обработки сообщений'''
     def action_query_map(self) -> dict[str, Callable[[str], Answer]]:
         '''Метод для контроли и обработки сообщений клиента.'''

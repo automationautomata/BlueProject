@@ -30,6 +30,7 @@ class ArduinoCommunicator:
         self.deffered_tags = set()
         self.handler_kwargs = handler_kwargs
         #### self.format_receive = format_receive - нужно ???
+    
     def open(self):
         '''ОТкрывает соединение'''
         self.connection.open()
