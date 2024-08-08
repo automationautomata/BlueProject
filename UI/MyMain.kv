@@ -1,140 +1,158 @@
 #:import Window kivy.core.window.Window
+#:import Factory kivy.factory.Factory
+
 
 <ThemeButton>:
     pos: (Window.width - 30, 0)
     size: (30, 30)
     background_normal: ''
 
+<DomainButton>:
+    pos: (Window.width - 125, 0)
+    size: (90, 30)
+    background_normal: ''
+
+<SortingButton>:
+    pos: (Window.width - 230, 0)
+    size: (100, 30)
+    background_normal: ''
+    on_press: Factory.SortingWindow().open_win()
+
 <ExplorerButton>:
-    border: (10, 10, 10, 10)
+    size_hint: (None, None)
+    background_normal: ''
 
-<EntitiesScreen>:
-    id: entities_screen
-    size: Window.size
+<SortingWindow>:
+    pos: (Window.width * .05, Window.height * .05)
+    size_hint: (.9, .9)
+    title: 'Sorting'
 
-    FloatLayout:
-        BoxLayout:
-            orientation: "horizontal"
-            size_hint: (None, None)
-            size: (Window.width, 50)
-            pos: (0, Window.height - 50)
+<MainScreen>:
 
-            ExplorerButton:
-                id: go_entites_screen
-                text: "Entities"
-                on_press: root.manager.current = "entities"
-            ExplorerButton:
-                id: go_access_rules_screen
-                text: 'Access rules'
-                on_press: root.manager.current = "rules"
-            ExplorerButton:
-                id: go_logs_screen
-                text: 'Logs'
-                on_press: root.manager.current = "logs"
+    ExplorerButton:
+        id: go_entites_screen
+        size: (Window.width / 3 - 2, 50)
+        pos: (0, Window.height - 50)
+        text: "Entities"
+        on_press: screen_manager.current = "entities"
 
-        TableHeader:
-            id: entities_header
-            pos: (0, Window.height - 100)
-            _height: 50
-            _width: Window.width
-            _rows: 1
-            _columns: 6
-            _titles: ('Name + sid', 'Card', 'Type', 'Right', 'Creation data', 'Deletion data')
-            _columns_width: (.32, .2, .12, .12, .12, .12)
+    ExplorerButton:
+        id: go_access_rules_screen
+        size: (Window.width / 3 - 2, 50)
+        pos: (Window.width / 3 + 1, Window.height - 50)
+        text: 'Access rules'
+        on_press: screen_manager.current = "rules"
 
-        TableContent:
-            id: entities_table
-            pos: (0, 30)
-            size_hint: (1, None)
-            size: (self._width, self._height - 30)
-            bar_width: 10
-            do_scroll_x: False
-            do_scroll_y: True
+    ExplorerButton:
+        id: go_logs_screen
+        size: (Window.width / 3 - 2, 50)
+        pos: (Window.width * 2 / 3 + 2, Window.height - 50)
+        text: 'Logs'
+        on_press: screen_manager.current = "logs"
 
-            _rows: 5
-            _columns: 6
-            _columns_width: (.32, .2, .12, .12, .12, .12)
+    ScreenManager:
+        id: screen_manager
 
-            GridLayout:
-                id: entities_content
-                rows: entities_table._rows
-                cols: entities_table._columns
-                row_default_height: '20dp'
-                row_force_default: True
-                size_hint_y: None
-                height: self.minimum_height
+        EntitiesScreen:
+            id: entities_screen
+            name: 'entities'
+            size: Window.size
 
-        Footer:
-            id: footer
-            ThemeButton:
-                id: theme_button
-                border: (10, 10, 10, 10)
-                background_color: app.app_color_themes['Theme button'][app.app_color_themes['Current theme']]
-                text: 'А'
-                on_press: self.switch_theme(root)
+            FloatLayout:
+                size_hint: (None, None)
+                size: (Window.width - 10, Window.height - 10)
+                TableHeader:
+                    id: entities_header
+                    pos: (5, Window.height - 105)
+                    _height: 50
+                    _rows: 1
+                    _columns: 6
+                    _titles: ('Name + sid', 'Card', 'Type', 'Right', 'Creation date', 'Deletion date')
+                    _columns_width: (.32, .2, .12, .12, .12, .12)
 
+                TableContent:
+                    id: entities_table
+                    pos: (5, 35)
+                    size_hint: (1, None)
+                    size: (self.width, self._height - 40)
+                    bar_width: 10
+                    do_scroll_x: False
+                    do_scroll_y: True
 
-<RulesScreen>:
-    size: Window.size
-    canvas:
-        Color:
-            rgba: (.1, .1, .1, .9)
-        Rectangle:
-            size: self.size
-            pos: self.pos
+                    _grid: entities_content
+                    _rows: 30
+                    _columns: 6
+                    _columns_width: (.32, .2, .12, .12, .12, .12)
 
-    FloatLayout:
-        BoxLayout:
-            orientation: "horizontal"
-            size_hint: (None, None)
-            size: (Window.width, 50)
-            pos: (0, Window.height - 50)
-
-            Button:
-                text: "Entities"
-                border: (10, 10, 10, 10)
-                background_color: (.5, .5, .8, .7)
-                on_press: root.manager.current = "entities"
-            Button:
-                text: 'Access rules'
-                border: (10, 10, 10, 10)
-                background_color: (.5, .5, .8, .7)
-                on_press: root.manager.current = "rules"
-            Button:
-                text: 'Logs'
-                border: (10, 10, 10, 10)
-                background_color: (.5, .5, .8, .7)
-                on_press: root.manager.current = "logs"
+                    GridLayout:
+                        id: entities_content
+                        rows: entities_table._rows
+                        cols: entities_table._columns
+                        row_default_height: '20dp'
+                        row_force_default: True
+                        size_hint_y: None
+                        height: self.minimum_height
 
 
-<LogsScreen>:
-    size: Window.size
-    canvas:
-        Color:
-            rgba: (.1, .1, .1, .9)
-        Rectangle:
-            size: self.size
-            pos: self.pos
+        RulesScreen:
+            id: access_rules_screen
+            name: 'rules'
+            size: Window.size
 
-    FloatLayout:
-        BoxLayout:
-            orientation: "horizontal"
-            size_hint: (None, None)
-            size: (Window.width, 50)
-            pos: (0, Window.height - 50)
+            FloatLayout:
+                TableHeader:
+                    id: access_rules_header
+                    pos: (0, Window.height - 100)
+                    _height: 50
+                    _rows: 1
+                    _columns: 5
+                    _titles: ('Id', 'Right', 'Room', 'Creation data', 'Deletion data')
+                    _columns_width: (.1, .25, .25, .2, .2)
 
-            Button:
-                text: "Entities"
-                border: (10, 10, 10, 10)
-                background_color: (.5, .5, .8, .7)
-                on_press: root.manager.current = "entities"
-            Button:
-                text: 'Access rules'
-                border: (10, 10, 10, 10)
-                background_color: (.5, .5, .8, .7)
-                on_press: root.manager.current = "rules"
-            Button:
-                text: 'Logs'
-                border: (10, 10, 10, 10)
-                background_color: (.5, .5, .8, .7)
-                on_press: root.manager.current = "logs"
+                TableContent:
+                    id: access_rules_table
+                    pos: (0, 30)
+                    size_hint: (1, None)
+                    size: (self.width, self._height - 30)
+                    bar_width: 10
+                    do_scroll_x: False
+                    do_scroll_y: True
+
+                    _grid: access_rules_content
+                    _rows: 5
+                    _columns: 5
+                    _columns_width: (.1, .25, .25, .2, .2)
+
+                    GridLayout:
+                        id: access_rules_content
+                        rows: access_rules_table._rows
+                        cols: access_rules_table._columns
+                        row_default_height: '20dp'
+                        row_force_default: True
+                        size_hint_y: None
+                        height: self.minimum_height
+
+
+        LogsScreen:
+            id: logs_screen
+            name: 'logs'
+            size: Window.size
+
+            FloatLayout:
+
+    Footer:
+        id: footer
+        ThemeButton:
+            id: theme_button
+            text: 'T'
+            on_press: self.switch_theme(root)
+
+        DomainButton:
+            id: domain_button
+            text: 'Domain'
+            on_press: pass
+
+        SortingButton:
+            id: sorting_button
+            text: 'Sorting'
+
