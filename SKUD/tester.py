@@ -1,46 +1,69 @@
-from datetime import datetime
-from typing import Any
-import requests
-import json
 
-from general.singleton import Singleton
+from threading import Thread
+import threading
+import time
+from typing import Any, Callable
+import tornado
+
+from ORM.database import DatabaseConnection
+from ORM.loggers import VisitLogger
+from intercom.auth_controller import AuthenticationController, UiSKUDController
+from remote.tools import Answer
 
 
-class SkudApiRequsts(Singleton):
-    def __init__(self, url: str) -> None:
-        self.url = url
+class QueryHandler(tornado.web.RequestHandler):
+    def initialize(self, action) -> None:
+        self.actions = action.action_query_map()
+        self.verify = action.verify
 
-    def get(self, body: Any, path="") -> dict | None:
-        try :
-            response = requests.get(self.url+path, data=body)
-            if response.status_code == 200:
-                return json.loads(response.text)
-            else:
-                print(f"Ошибка {response.status_code}: {response.reason}")
-        except NameError:
-            print("get ERR", NameError)
-
-    def fmt(self, action, data) -> dict:
-        return {"action": action, "data": data, "auth": {"token": self.token}}
-    
-    def get_table(self, table: str, start: int, order_column: str, order_type: str) -> dict | None: 
-        self.get(self.fmt(table + " query", 
-                          {"start": start, "order_column": order_column, "order_type": order_type}))
+    def get(self) -> None:
+        print(threading.get_native_id())
+        print(self.request.headers) 
+        headers = self.request.headers
+        if self.verify(token=headers.get("X-Auth"), id=headers.get("X-Id")):
+            answer = self.actions[self.get_body_argument("action")](self.get_body_argument("data"))
+            print(answer.toJSON())
+            self.write(answer.toJSON())
         
-    def authentication(self, key: int) -> tuple[bool, str]:
-        answer = self.get(self.fmt("auth", {"key": key, "datetime": datetime.now().isoformat()}), "\\auth")
+    def post(self) -> None:
+        if self.verify(self.request.headers.get("auth")):
+            answer = self.actions[self.get_body_argument("action")](self.get_body_argument("data"))
+            self.set_header("Content-Type", "text/plain")
+            self.write(answer.toJSON())
 
-        err = "answer is None"
-        if answer:
-            err = answer["data"]["error"]
-            if err == "":
-                self.token = answer["data"]["token"]
-                return True, err
-        return False, err
+    def put(self) -> None:
+        if self.verify(self.request.headers.get("auth")):
+            answer = self.actions[self.get_body_argument("action")](self.get_body_argument("data"))
+            self.set_header("Content-Type", "text/plain")
+            self.write(answer.toJSON())
 
-api = SkudApiRequsts("localhost:8080")
-while True:
-    if input() == "auth":
-        api.authentication()
-    if input() == "get":
-        api.authentication()
+    def delete(self) -> None:
+        if self.verify(self.request.headers.get("auth")):
+            answer = self.actions[self.get_body_argument("action")](self.get_body_argument("data"))
+            self.set_header("Content-Type", "text/plain")
+            self.write(answer.toJSON())
+
+class AuthenticationHandler(tornado.web.RequestHandler):
+    def initialize(self, verificator: Callable[[str], Answer]):
+        self.verificator = verificator
+
+    def get(self) -> None:
+        answer = self.verificator(self.get_body_argument("auth"))
+        self.write(answer.toJSON())
+
+
+skud_db = DatabaseConnection(scriptpath=".\\SKUD\\dbscripts\\skud_script.sql",
+                             name="SKUD", dirpath=".\\SKUD\\DB")
+visits = VisitLogger(name="visits", dirpath=".\\SKUD\\DB")
+
+a = AuthenticationController(0, visits, skud_db)
+
+ui = UiSKUDController(skud_db=skud_db)
+app = tornado.web.Application([
+    (r"/ui+", QueryHandler, dict(action=ui)), 
+    (r"/auth", AuthenticationHandler, dict(verificator=a.verificator))
+    ])
+app.listen(8080)
+
+Thread(target=tornado.ioloop.IOLoop.current().start, daemon=True).start()
+time.sleep(200)

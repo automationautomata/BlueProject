@@ -12,20 +12,21 @@ class Logger(DatabaseConnection):
     
     def addlog(self, row: list[str]):
         '''Добавляет запись в таблицу истории посещений комнат. `row` - добавляемая строка'''
-        cursor = self._connection_.cursor()
+        conn = self.threadsafe_connect()
+        cursor = conn.cursor()
         sql = "INSERT INTO projects(message, time) VALUES(?,?)"
         time = datetime.now().isoformat()
         fmt = lambda msg: (msg, time)
         try:
             cursor.execute(sql, list(map(fmt, row)))
-            self._connection_.commit()
+            conn.commit()
             return True
         except: 
             return False
 
 class VisitLogger(DatabaseConnection):
     '''Класс для установки соединения с БД посещений'''
-    __scriptpath = ".\\dbscripts\\visits_script.sql"
+    __scriptpath = ".\\SKUD\\dbscripts\\visits_script.sql"
 
     def __init__(self, name: str, dirpath: str = "./") -> None:
         '''`name` - название БД, `dirpath` - путь к БД.'''
@@ -33,27 +34,29 @@ class VisitLogger(DatabaseConnection):
 
     def addvisit(self, row: VisitsHistory):
         '''Добавляет запись в таблицу истории посещений комнат. `row` - добавляемая строка'''
-        cursor = self._connection_.cursor()
+        conn = self.threadsafe_connect()
+        cursor = conn.cursor()
         sql = "INSERT INTO visits_history (port, message, pass_time) VALUES (?,?,?);"
         data = (row.port, row.message, row.pass_time)
         try: 
             cursor.execute(sql, data)
-            self._connection_.commit()
+            conn.commit()
             return True
-        except NameError: 
-            print("ERR", NameError)
+        except BaseException as error: 
+            print("ERR", error)
             return False
         
     def addsession(self, row: RemoteSessions):
-        cursor = self._connection_.cursor()
+        conn = self.threadsafe_connect()
+        cursor = conn.cursor()
         sql = "INSERT INTO remote_sessions (address, token, event, message, sign_in_time) VALUES (?,?,?);"
         data = (row.address, row.token, row.event, row.message, row.sign_in_time)
         try: 
             cursor.execute(sql, data)
-            self._connection_.commit()
+            conn.commit()
             return True
-        except NameError: 
-            print("ERR", NameError)
+        except BaseException as error: 
+            print("ERR", error)
             return False
 
     

@@ -3,6 +3,8 @@ import time
 from typing import Any, Self
 import requests
 
+from general.singleton import Singleton
+
 # URL для запроса
 def test():
     url = 'http://localhost:8080'
@@ -20,38 +22,83 @@ def test():
     except requests.exceptions.RequestException as e:
         print(f"Произошла ошибка при выполнении запроса: {e}")
 
+from requests.auth import AuthBase
 
-class SkudHttpRequsts:
-    _instance: Self = None
-    def __new__(class_, **kwargs) -> str:
-        if not isinstance(class_._instance, class_):
-            class_._instance = object.__new__(class_)
-            class_._instance.url = kwargs['url']
-        return class_._instance
-    
-    def get(self, json_body: dict) -> str:
-        '''Отправляет запрос и возвращает ответ'''
-        try :
-            response = requests.get(self.url, data=json_body)
+class TokenAuth(AuthBase):
+    """Присоединяет HTTP аутентификацию к объекту запроса."""
+    def __init__(self, token, id):
+        # здесь настроем любые данные, связанные с аутентификацией 
+        self.token = token
+        self.id = id
+
+    def __call__(self, req):
+        # изменяем и возвращаем запрос
+        if self.token:
+            req.headers['X-Auth'] = self.token
+            req.headers['X-Id'] = self.id
+        return req
+# while True:
+#     time.sleep(0.5)
+#     print(sd.get_table("entities", 0, "card", True))
+
+
+class SkudApiRequsts(Singleton):
+    def __init__(self, url: str) -> None:
+        self.url = url
+        self.token = None
+        self.id = None
+
+    def get(self, body: Any, path="") -> requests.Response | None:
+        try:
+            response = requests.get(self.url+path, data=body, auth=TokenAuth(self.token, self.id))
             if response.status_code == 200:
-                print(response.text)
-                return response.text
+                return response
             else:
                 print(f"Ошибка {response.status_code}: {response.reason}")
-        except NameError:
-            print("get ERR", NameError)
-    
-    def get_table(self, table: str, start, order_column, order_type) -> dict[str, Any]: 
-        res = self.get({"action": table + " query", 
-                         "data": json.dumps({"start": start, "order_column": order_column, 
-                                             "order_type": order_type})})
-        return json.loads(res) if res else None
-    
-    def get_sorted(self, table: str, sorting_rules: dict[str, str]) -> dict[str, Any]: 
-        res =  self.get({"action": table + " sorted", "data": json.dumps(sorting_rules)})
-        return json.loads(res) if res else None
+        except Exception as error:
+            print("get ERR", error)
 
-sd = SkudHttpRequsts(url='http://localhost:8080')
+    def fmt(self, action, data) -> dict:
+        return {"action": action, 
+                "data"  : json.dumps(data)}
+    
+    def get_table(self, table: str, start: int, order_column: str, order_type: bool) -> dict | None:
+        action = f"{table} query"
+        data = {"start"       : start, 
+                "order_type"  : order_type, 
+                "order_column": order_column}
+ 
+        response = self.get(self.fmt(action,  data), "/ui")
+        try: 
+            return response.json()
+        except Exception as error:
+            print("response:", response.text if response else "None", 
+                  "ERR:", error)
+        
+    def authentication(self, key: int) -> tuple[bool, str]:
+        data = json.dumps({"key": key, "id": self.id})
+        response = self.get({"auth": data}, "/auth")
+        try:
+            answer = response.json()
+            print(answer)
+
+            err = "answer is None"
+            if answer:
+                err = answer["error"]
+                if err == "":
+                    self.token = answer["data"]
+                    return True, err
+            return False, err
+        except BaseException as error:
+            return False, error
+
+api = SkudApiRequsts(url="http://localhost:8080")
+print("url", api.url)
+api.id = 2
 while True:
-    time.sleep(0.5)
-    print(sd.get_table("entities", 0, "card", True))
+    if input() == "auth":
+        print("err, ", api.authentication(12))
+    else:
+        print("mmmm")
+        print("req", api.get_table("entities", 0, "card", False))
+        print("ssss")

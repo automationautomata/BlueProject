@@ -47,12 +47,12 @@ class AccessController:
                 if inserted_row: print(port, inserted_row.toJSON())
                 else: print(port, data)
 
-        except NameError:
+        except BaseException as error:
             if kwargs["logger"]:
-                kwargs["logger"].addlog(f"In AccessController.arduino_handler() with port = {port} and data = {data} ERROR: {NameError}")
+                kwargs["logger"].addlog(f"In AccessController.arduino_handler() with port = {port} and data = {data} ERROR: {error}")
             
             #### DEBUG ####
-            if self.Debug: print(NameError)
+            if self.Debug: print(error)
 
     def distribute_keys(self, room_port: dict[int, str]) -> None:
         '''Распределяет ключи по устройствам. `room_port` - словарь, где ключ - комната, а занчение - название порта'''

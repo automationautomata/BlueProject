@@ -18,7 +18,7 @@ class Actions(Protocol):
     def action_query_map(self) -> dict[str, Callable[[str], Answer]]:
         '''Метод для контроли и обработки сообщений клиента.'''
         pass
-    def verify(self, data: Any) -> bool:
+    def verify(self, **kwargs) -> bool:
         '''Метод для верификации клиенита.'''
         pass
 

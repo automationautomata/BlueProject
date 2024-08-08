@@ -57,10 +57,10 @@ class ArduinoCommunicator:
         и возвращает ответ от него, если соединение закрыто, то открывает его заново'''
         try:
             return self.communicate(self.format_send(data))
-        except NameError: 
+        except BaseException as error: 
             if self.logger:
-                self.logger.addlog(f"In ArduinoCommunicator.communicate() with input data: {data} ERROR: {NameError}")
-            print(NameError)
+                self.logger.addlog(f"In ArduinoCommunicator.communicate() with input data: {data} ERROR: {error}")
+            print(error)
 
     def write(self, data: str) -> str | None:
         '''Отправляет данные в формате строки на ардуино и возвращает ответ от него, 
@@ -70,10 +70,10 @@ class ArduinoCommunicator:
                 self.connection.open()
                 print("write", data.encode())
             return self.connection.write(data.encode())
-        except NameError: 
+        except BaseException as error: 
             if self.logger:
-                self.logger.addlog(f"In ArduinoCommunicator.communicate() with input data: {data} ERROR: {NameError}")
-            print(NameError)
+                self.logger.addlog(f"In ArduinoCommunicator.communicate() with input data: {data} ERROR: {error}")
+            print(error)
 
     async def listener(self, timeout) -> None:
         '''Слушает порт, если в буффер не пуст и первый символ совпадает со `startflag`, то читает до `endflag` и отправляет 

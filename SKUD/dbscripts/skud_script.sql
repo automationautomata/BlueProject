@@ -30,7 +30,7 @@ CREATE TABLE access_rules (
 );
 CREATE TABLE entities (
     card VARCHAR(4),
-    sid INTEGER PRIMARY KEY,
+    sid INTEGER PRIMARY KEY NOT NULL,
     type VARCHAR(1) NOT NULL,
     right INTEGER NOT NULL,
     date_time_begin TEXT NOT NULL,
@@ -73,13 +73,13 @@ AS select access_rules.room,
 --------------------------------------------------------------------------------    
 
 INSERT into cards (id, isSabotaged, date_time_begin) values (12, 0, strftime('%Y-%m-%d %H:%M:%S', datetime('now'))), 
-                                                      (15, 0, strftime('%Y-%m-%d %H:%M:%S', datetime('now')));             
+                                                            (15, 0, strftime('%Y-%m-%d %H:%M:%S', datetime('now')));             
 INSERT into rooms (name, date_time) values ('office', strftime('%Y-%m-%d %H:%M:%S', datetime('now'))), 
-                                           ('work',   strftime('%Y-%m-%d %H:%M:%S', datetime('now')));
-                                           ('UI',   strftime('%Y-%m-%d %H:%M:%S', datetime('now')));
+                                           ('work'  , strftime('%Y-%m-%d %H:%M:%S', datetime('now'))),
+                                           ('UI'    , strftime('%Y-%m-%d %H:%M:%S', datetime('now')));
                                                                    
-INSERT into rights (name, date_time_begin) values ('admin', strftime('%Y-%m-%d %H:%M:%S', datetime('now'))), 
-                                                  ('employee',   strftime('%Y-%m-%d %H:%M:%S', datetime('now')));
+INSERT into rights (name, date_time_begin) values ('admin'   ,  strftime('%Y-%m-%d %H:%M:%S', datetime('now'))), 
+                                                  ('employee',  strftime('%Y-%m-%d %H:%M:%S', datetime('now')));
 
 INSERT into access_rules (right, room, date_time_begin) values (0, 0, strftime('%Y-%m-%d %H:%M:%S', datetime('now'))), 
                                                                (0, 1, strftime('%Y-%m-%d %H:%M:%S', datetime('now'))),

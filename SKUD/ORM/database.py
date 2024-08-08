@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
 import sqlite3
 import os
+import threading
+
+from general.singleton import Singleton
 
 # Шаблон класса для установки соединений с БД
 class DatabaseABC(ABC):
@@ -21,65 +24,75 @@ class DatabaseABC(ABC):
     def close(self) -> None: 
         pass
 
-
-class DatabaseConnection(DatabaseABC):
-    def __init__(self, scriptpath: str, name: str, dirpath: str = "./") -> None:
+class DatabaseConnection(DatabaseABC, Singleton):
+    def __init__(self, scriptpath: str, name: str, dirpath: str = ".\\") -> None:
         '''`scriptpath` - путь к скрипту, создающему бд,
         `name` - название БД, `dirpath` - папка с БД'''
         self.__scriptpath = scriptpath
         self.__name = name
         self.__dirpath = dirpath
-        self._connection_ = None
+        self._connection_ = {} #: dict[int, sqlite3.Connection] = {}
+        
+    def threadsafe_connect(self) -> sqlite3.Connection:
+        path = f"{self.__dirpath}{self.__name}"
+        thread_id = threading.get_native_id()
+        if thread_id not in self._connection_.keys():
+            self._connection_[thread_id] = sqlite3.connect(path)        
+        return self._connection_[thread_id]
 
     def establish_connection(self) -> None:
         '''Устанавливает соединение c базой и, если БД отсутствует,
         то пересоздает ее на основе указанного скрипта.'''
         path = f"{self.__dirpath}{self.__name}"
         if not os.path.exists(path):
-            self._createdatabase_(path)
-        elif not self._connection_: 
-            self._connection_ = sqlite3.connect(path)
+            self._createdatabase_()
         else: 
             try: 
-                self._connection_.cursor()
+                self.threadsafe_connect().cursor()
             except: 
-                self._connection_ = sqlite3.connect(path)
+                thread_id = threading.get_native_id()
+                self._connection_[thread_id] = sqlite3.connect(path)
 
-    def _createdatabase_(self, path: str) -> None:
+    def _createdatabase_(self) -> None:
         '''Создает базу данных на основе скрипта.'''
-        self._connection_ = sqlite3.connect(path)
-        cursor = self._connection_.cursor()
+        conn = self.threadsafe_connect()
+        cursor = conn.cursor()
 
-        with open(self.__scriptpath, "r+") as scriptfile:
+        with open(self.__scriptpath, mode="r+", encoding="utf8") as scriptfile:
             script = scriptfile.read()
             cursor.executescript(script)
-            self._connection_.commit()
+            conn.commit()
 
     def execute_query(self, command: str, *params) -> list[tuple]: 
         '''Выполняет указанную команду command с параметрами params (см. документацию SQLite).'''
-        cursor = self._connection_.cursor()
+        conn = self.threadsafe_connect()
+        cursor = conn.cursor()
         result = cursor.execute(command, params).fetchall()
-        self._connection_.commit()
+        conn.commit()
         return result
     
     def execute(self, command: str, *params) -> list[tuple]: 
         '''Выполняет указанную команду command с параметрами params (см. документацию SQLite).'''
-        cursor = self._connection_.cursor()
+        conn = self.threadsafe_connect()
+        cursor = conn.cursor()
         result = cursor.execute(command, params)
-        self._connection_.commit()
+        conn.commit()
+        return result
         
     def table_cols(self, table: str):
-        return list(map(lambda row: row[0], 
-                                self.skud_db.execute_query(f"SELECT c.name FROM pragma_table_info('{table}') as c;")))
+        sql = f"SELECT c.name FROM pragma_table_info('{table}') as c;"
+        return list(map(lambda row: row[0], self.execute_query(sql)))
     
     def rows_to_dicts(self, col_names: list[str], rows: list[tuple]) -> list[dict]:
         data = []
         for row in rows:
             dict_row = {col: val for val, col in zip(row, col_names)}
-            data.append(dict_row)
+            data += dict_row
         return data
 
     def close(self) -> None:
         '''Закрывает соединение с БД'''
-        self._connection_.close()
+        for key in self._connection_.keys():
+            self._connection_[key].close()
+            del self._connection_[key]
     
