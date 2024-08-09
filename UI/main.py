@@ -30,8 +30,10 @@ Config.set('graphics', 'height', '600')
 Config.write()
 Builder.load_file('MyMain.kv')
 
-entities_db = [['A', 'A', 'A', 'A', 'A', 'A'] for _ in range(30)]
-rules_db = [['A', 'A', 'A', 'A', 'A'] for _ in range(5)]
+entities_db = [['A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A'] for _ in range(30)]
+rules_db = [['A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A'] for _ in range(5)]
+
+test = {'data': [{'card': '15', 'isSabotagedCard': '0', 'cardAddDate': '2024-08-08 20:29:38', 'cardDelDate': None, 'right': 1, 'rightName': 'admin', 'rightAddDate': '2024-08-08 20:29:38', 'rightDelDate': None, 'sid': 5, 'type': '0', 'entityAddDate': '2024-08-08 20:29:38', 'entityDelDate': None}], 'error': ''}
 
 class ThemeButton(Button):
     def __init__(self, **kwargs):
@@ -93,6 +95,9 @@ class ExplorerButton(Button):
 "======================================================================================================================="
 
 class MyLabelTable(Label):
+    def __init__(self, **kwargs):
+        super(MyLabelTable, self).__init__(**kwargs)
+
     def on_size(self, *args):
         self.parent_win = self.parent.parent
         self.canvas.before.clear()
@@ -105,6 +110,9 @@ class MyLabelTable(Label):
             Rectangle(pos=(self.x + 1, self.y + 1), size=(self.width - 2, self.height - 2))
 
 class MyLabelHeader(Label):
+    def __init__(self, **kwargs):
+        super(MyLabelHeader, self).__init__(**kwargs)
+
     def on_size(self, *args):
         self.canvas.before.clear()
         self.background_normal = ''
@@ -115,47 +123,85 @@ class MyLabelHeader(Label):
             Color(*app.themes[app.current_theme]['Additionally'][0])
             Rectangle(pos=(self.x + 1, self.y + 1), size=(self.width - 2, self.height - 2))
 
-class TableHeader(Widget):
+class TableHeader(ScrollView):
+    _grid = None
+    _width = NumericProperty(1740)
     _height = NumericProperty(50)
-    _rows = NumericProperty(1)
-    _columns = NumericProperty(6)
-    _titles = ListProperty()
     _columns_width = ListProperty()
+    _titles = ListProperty()
 
-    def on_size(self, *args):
-        self._update(*args)
+    def __init__(self, **kwargs):
+        super(TableHeader, self).__init__(**kwargs)
+        self.pos = (5, Window.height - 105)
+        self.size_hint = (None, None)
+        self.size = (self._width, self._height)
+        self.bar_width = 0
+        self.do_scroll_x = False
+        self.do_scroll_y = False
+
+    def load_data(self, *args):
+        self._update()
 
     def _update(self, *args):
-        self.canvas.clear()
-        with self.canvas:
-            self.grid = GridLayout(rows=self._rows,
-                cols=self._columns,
-                size=[self.width, self._height],
-                pos=self.pos)
-
+        self._grid.clear_widgets()
         for col in range(self._columns):
-            label = MyLabelHeader(text=self._titles[col],
-                size_hint=[self._columns_width[col], .25])
-            self.grid.add_widget(label)
+            label = MyLabelHeader(text=self._titles[col])
+            self._grid.add_widget(label)
+
+    def scrolling(self, dist):
+        if dist == 0:
+            self.scroll_x = 0
+        else:
+            self.scroll_x = dist / 0.536
 
 class TableContent(ScrollView):
     _grid = None
-    _color = ListProperty()
-    _height = NumericProperty(650)
+    _header = None
+    _width = NumericProperty(1740)
+    _height = NumericProperty(610)
     _columns_width = ListProperty()
     table_data = ListProperty()
 
+    def __init__(self, **kwargs):
+        super(TableContent, self).__init__(**kwargs)
+        self.pos = (5, 35)
+        self.size_hint = (None, None)
+        self.size = (self._width, self._height)
+        self.bar_width = 10
+        self.scroll_type = ['bars'] # Перемещение с помощью ползунков
+        self.always_overscroll = False
+        self.smooth_scroll_end = 10
+        self.do_scroll_x = True
+        self.do_scroll_y = True
+
+        self.bind(hbar=self.scroll_content)
+
     def load_data(self, data):
         self.table_data = data
+
+
+
+
+
+
+
+
+
+
+
+
+        
         self._update()
 
     def _update(self):
         self._grid.clear_widgets()
         for row in range(self._rows):
             for col in range(self._columns):
-                label = MyLabelTable(text=self.table_data[row][col],
-                    size_hint=[self._columns_width[col], .25])
+                label = MyLabelTable(text=self.table_data[row][col])
                 self._grid.add_widget(label)
+
+    def scroll_content(self, instance, value):
+        self._header.scrolling(value[0])
 
 "======================================================================================================================="
 
@@ -176,7 +222,9 @@ class MainScreen(Screen):
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
         self.ids.entities_table.load_data(entities_db)
+        self.ids.entities_header.load_data()
         self.ids.access_rules_table.load_data(rules_db)
+        self.ids.access_rules_header.load_data()
 
     def _update(self):
         Window.clearcolor = app.themes[app.current_theme]['Base'][0]

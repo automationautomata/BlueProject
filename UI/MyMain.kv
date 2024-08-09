@@ -61,37 +61,45 @@
             FloatLayout:
                 size_hint: (None, None)
                 size: (Window.width - 10, Window.height - 10)
+
                 TableHeader:
                     id: entities_header
-                    pos: (5, Window.height - 105)
-                    _height: 50
+
+                    _grid: entities_header_content
                     _rows: 1
-                    _columns: 6
-                    _titles: ('Name + sid', 'Card', 'Type', 'Right', 'Creation date', 'Deletion date')
-                    _columns_width: (.32, .2, .12, .12, .12, .12)
+                    _columns: 12
+                    _titles: ('card', 'isSabotagedCard', 'cardAddDate', 'cardDelDate', 'right', 'rightName', 'rightAddDate', 'rightDelDate', 'sid/Name', 'type', 'entityAddDate', 'entityDelDate')
+
+                    GridLayout:
+                        id: entities_header_content
+                        rows: entities_header._rows
+                        cols: entities_header._columns
+                        col_default_width: '250dp'
+                        col_force_default: True
+                        size_hint_x: None
+                        width: self.minimum_width
 
                 TableContent:
                     id: entities_table
-                    pos: (5, 35)
-                    size_hint: (1, None)
-                    size: (self.width, self._height - 40)
-                    bar_width: 10
-                    do_scroll_x: False
-                    do_scroll_y: True
 
-                    _grid: entities_content
+                    _grid: entities_table_content
+                    _header: root.ids.entities_header
                     _rows: 30
-                    _columns: 6
-                    _columns_width: (.32, .2, .12, .12, .12, .12)
+                    _columns: 12
 
                     GridLayout:
-                        id: entities_content
+                        id: entities_table_content
                         rows: entities_table._rows
                         cols: entities_table._columns
                         row_default_height: '20dp'
                         row_force_default: True
                         size_hint_y: None
                         height: self.minimum_height
+
+                        col_default_width: '250dp'
+                        col_force_default: True
+                        size_hint_x: None
+                        width: self.minimum_width
 
 
         RulesScreen:
@@ -100,37 +108,47 @@
             size: Window.size
 
             FloatLayout:
+                size_hint: (None, None)
+                size: (Window.width - 10, Window.height - 10)
+
                 TableHeader:
                     id: access_rules_header
-                    pos: (0, Window.height - 100)
-                    _height: 50
+
+                    _grid: access_rules_header_content
                     _rows: 1
-                    _columns: 5
-                    _titles: ('Id', 'Right', 'Room', 'Creation data', 'Deletion data')
-                    _columns_width: (.1, .25, .25, .2, .2)
+                    _columns: 10
+                    _titles: ('room', 'roomName', 'roomAddDate', 'roomDeleDate', 'right', 'rightName', 'rightAddDate', 'rightDelDate', 'ruleAddDate', 'ruleDelDate')
+
+                    GridLayout:
+                        id: access_rules_header_content
+                        rows: access_rules_header._rows
+                        cols: access_rules_header._columns
+                        col_default_width: '250dp'
+                        col_force_default: True
+                        size_hint_x: None
+                        width: self.minimum_width
 
                 TableContent:
                     id: access_rules_table
-                    pos: (0, 30)
-                    size_hint: (1, None)
-                    size: (self.width, self._height - 30)
-                    bar_width: 10
-                    do_scroll_x: False
-                    do_scroll_y: True
 
-                    _grid: access_rules_content
+                    _grid: access_rules_table_content
+                    _header: root.ids.access_rules_header
                     _rows: 5
-                    _columns: 5
-                    _columns_width: (.1, .25, .25, .2, .2)
+                    _columns: 10
 
                     GridLayout:
-                        id: access_rules_content
+                        id: access_rules_table_content
                         rows: access_rules_table._rows
                         cols: access_rules_table._columns
                         row_default_height: '20dp'
                         row_force_default: True
                         size_hint_y: None
                         height: self.minimum_height
+
+                        col_default_width: '250dp'
+                        col_force_default: True
+                        size_hint_x: None
+                        width: self.minimum_width
 
 
         LogsScreen:
