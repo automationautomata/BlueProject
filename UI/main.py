@@ -33,7 +33,19 @@ Builder.load_file('MyMain.kv')
 entities_db = [['A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A'] for _ in range(30)]
 rules_db = [['A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A'] for _ in range(5)]
 
-test = {'data': [{'card': '15', 'isSabotagedCard': '0', 'cardAddDate': '2024-08-08 20:29:38', 'cardDelDate': None, 'right': 1, 'rightName': 'admin', 'rightAddDate': '2024-08-08 20:29:38', 'rightDelDate': None, 'sid': 5, 'type': '0', 'entityAddDate': '2024-08-08 20:29:38', 'entityDelDate': None}], 'error': ''}
+test = {'data': [{'card': '15',
+                'isSabotagedCard': '0',
+                'cardAddDate': '2024-08-08 20:29:38',
+                'cardDelDate': None,
+                'right': 1,
+                'rightName':'admin',
+                'rightAddDate': '2024-08-08 20:29:38',
+                'rightDelDate': None,
+                'sid': 5,
+                'type': '0',
+                'entityAddDate': '2024-08-08 20:29:38',
+                'entityDelDate': None}],
+        'error': ''}
 
 class ThemeButton(Button):
     def __init__(self, **kwargs):
@@ -152,13 +164,14 @@ class TableHeader(ScrollView):
         if dist == 0:
             self.scroll_x = 0
         else:
-            self.scroll_x = dist / 0.536
+            self.scroll_x = dist[0] / (1 - dist[1])
 
 class TableContent(ScrollView):
     _grid = None
     _header = None
     _width = NumericProperty(1740)
     _height = NumericProperty(610)
+    _rows = NumericProperty()
     _columns_width = ListProperty()
     table_data = ListProperty()
 
@@ -176,21 +189,23 @@ class TableContent(ScrollView):
 
         self.bind(hbar=self.scroll_content)
 
-    def load_data(self, data):
-        self.table_data = data
+    def load_data(self, data1, test):
+        if test['error']:
+            raise NameError(test['error'])
 
+        data = test['data']
+        for record in range(len(data)):
+            row = []
+            for col in self._header._titles:
+                if data[record][col] is not None and str(data[record][col]):
+                    row.append(str(data[record][col]))
+                else:
+                    row.append('-')
+            self.table_data.append(row)
 
+        for empty in range(25 - len(self.table_data)):
+            self.table_data.append(' ' * len(self._header._titles))
 
-
-
-
-
-
-
-
-
-
-        
         self._update()
 
     def _update(self):
@@ -201,7 +216,8 @@ class TableContent(ScrollView):
                 self._grid.add_widget(label)
 
     def scroll_content(self, instance, value):
-        self._header.scrolling(value[0])
+        print(value)
+        self._header.scrolling(value)
 
 "======================================================================================================================="
 
@@ -221,9 +237,9 @@ class Footer(Widget):
 class MainScreen(Screen):
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
-        self.ids.entities_table.load_data(entities_db)
+        self.ids.entities_table.load_data(entities_db, test)
         self.ids.entities_header.load_data()
-        self.ids.access_rules_table.load_data(rules_db)
+        self.ids.access_rules_table.load_data(rules_db, {'data': [], 'error': ''})
         self.ids.access_rules_header.load_data()
 
     def _update(self):
