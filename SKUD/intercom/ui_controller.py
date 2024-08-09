@@ -29,6 +29,7 @@ class UiController:
                             params["order_column"], params["order_type"])
 
             res = self.skud_db.execute_query(sql)
+            print(res)
             return Answer(self.skud_db.rows_to_dicts(col_names, res), "")
         except BaseException as error:
             if self.logger:

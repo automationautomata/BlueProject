@@ -7,7 +7,8 @@ import tornado
 
 from ORM.database import DatabaseConnection
 from ORM.loggers import VisitLogger
-from intercom.auth_controller import AuthenticationController, UiSKUDController
+from intercom.auth_controller import AuthenticationController
+from intercom.ui_controller import UiSKUDController
 from remote.tools import Answer
 
 

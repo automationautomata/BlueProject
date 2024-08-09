@@ -87,7 +87,8 @@ class DatabaseConnection(DatabaseABC, Singleton):
         data = []
         for row in rows:
             dict_row = {col: val for val, col in zip(row, col_names)}
-            data += dict_row
+            data.append(dict_row)
+            print("rw", dict_row)
         return data
 
     def close(self) -> None:
