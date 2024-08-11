@@ -1,16 +1,24 @@
 # Глобальные константы для СКУДа
 
-DB_NAME = "SKUD"
-'''Название базы данных СКУДа'''
+import os
 
-DB_DIR = ".\\DB\\"
+ROOT_DIR = os.getcwd() 
+'''Корневая папка'''
+
+DB_DIR = f"{ROOT_DIR}\\DB"
 '''Путь к папке с БД'''
 
-SKUD_SCRIPT_PATH = ".\\dbscripts\\skud_script.sql"
-'''Путь к скрипту, создающему базу данных'''
+SKUD_DB_NAME = "SKUD.db"
+'''Название базы данных СКУДа'''
 
-ROOT_DIR = "E:\\BlueProject\\"
-'''Директория, в которой содержится база данных'''
+VISITS_DB_NAME = "visits.db"
+'''Название базы данных СКУДа'''
+
+SKUD_SCRIPT_PATH = f"{ROOT_DIR}\\dbscripts\\skud_script.sql"
+'''Путь к скрипту, создающему базу данных СКУДа'''
+
+VISITS_SCRIPT_PATH = f"{ROOT_DIR}\\dbscripts\\visits_script.sql"
+'''Путь к скрипту, создающему базу данных посещений'''
 
 ARDUINO_PORTS = ["COM6", "COM7"]
 '''Список портов, к которым присоединены платы'''

@@ -1,11 +1,9 @@
 import asyncio
-import os
-import sys
 import serial, serial.tools.list_ports
 from typing import Callable
 from threading import Thread
-sys.path.append(os.path.dirname(os.path.dirname((os.path.realpath(__file__)))))
 from hardware.arduino import ArduinoCommunicator
+
 
 def getportsinfo() -> str:
     '''Возвращает информацию обо всех COM портах в json-подобном виде'''

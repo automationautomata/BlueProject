@@ -1,8 +1,7 @@
-import copy
 import json
 
 from ORM.database import DatabaseConnection
-from ORM.entities.tables import VisitsHistory
+from ORM.tables import VisitsHistory
 from ORM.loggers import VisitLogger, Logger
 from remote.tools import WebsoketClients
 from hardware.setting import arduions_configuring
@@ -18,10 +17,7 @@ class AccessController:
         self.visits_db = visits_db
         self.visits_db.establish_connection()
 
-        handler_kwargs = {"visits_db": copy.deepcopy(self.visits_db), 
-                          "logger"   : copy.deepcopy(logger)} #if logger else None}
-
-        self.arduinos_therad, self.arduinos = arduions_configuring(ports, self.arduino_handler, handler_kwargs)
+        self.arduinos_therad, self.arduinos = arduions_configuring(ports, self.arduino_handler)
         self.logger = logger
         if self.logger:
             self.logger.establish_connection()
@@ -36,9 +32,9 @@ class AccessController:
 
             if msg["type"] == "pass":
                 inserted_row = VisitsHistory(port, msg["key"])
-                kwargs["visits_db"].establish_connection()
+                self.visits_db.establish_connection()
                 if "key" in msg.keys():
-                    check = kwargs["visits_db"].addvisit(inserted_row)
+                    check = self.visits_db.addvisit(inserted_row)
                     if check:
                         WebsoketClients().send(inserted_row.toJSON())
 
@@ -48,8 +44,8 @@ class AccessController:
                 else: print(port, data)
 
         except BaseException as error:
-            if kwargs["logger"]:
-                kwargs["logger"].addlog(f"In AccessController.arduino_handler() with port = {port} and data = {data} ERROR: {error}")
+            if self.logger:
+                self.logger.addlog(f"In AccessController.arduino_handler() with port = {port} and data = {data} ERROR: {error}")
             
             #### DEBUG ####
             if self.Debug: print(error)

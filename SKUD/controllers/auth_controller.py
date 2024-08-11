@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 from ORM.database import DatabaseConnection
 from ORM.loggers import Logger, VisitLogger
-from ORM.queries.templates import condition_query
+from ORM.queries import condition_query
 from general.singleton import Singleton
 from remote.ui import Answer
 

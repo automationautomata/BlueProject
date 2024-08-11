@@ -1,7 +1,26 @@
-from json import JSONEncoder
 import json
+from datetime import datetime
 
-class EntityView(JSONEncoder):
+class VisitsHistory:
+    def __init__(self, port: str, message: str):
+        self.port = port
+        self.message = message
+        self.pass_time = str(datetime.now().isoformat())
+    def toJSON(self):
+        return json.dump(self.__dict__)
+    
+class RemoteSessions:
+    def __init__(self, address: str, token: int, event: str, message: str):
+        self.address = address
+        self.token = token
+        self.event = event
+        self.message = message
+        self.sign_in_time = str(datetime.now().isoformat())
+    def toJSON(self):
+        return json.dump(self.__dict__)
+
+
+class EntityView:
      def __init__(self, **kwargs) -> None:
         self.card = kwargs["card"]
         self.isSabotagedCard = kwargs["isSabotagedCard"]
@@ -18,7 +37,7 @@ class EntityView(JSONEncoder):
         return json.dumps(self, default=lambda o: o.__dict__, 
                          sort_keys=True, indent=4)
      
-class AccessRuleView(JSONEncoder):
+class AccessRuleView:
      def __init__(self, room, roomName, roomAddDate, roomDeleDate,
                         right, rightName, rightAddDate, rightDelDate, 
                         ruleAddDate, ruleDelDate):
@@ -32,7 +51,6 @@ class AccessRuleView(JSONEncoder):
         self.rightDelDate = rightDelDate
         self.ruleAddDate = ruleAddDate
         self.ruleDelDate = ruleDelDate
-        
      def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, 
                          sort_keys=True, indent=4)

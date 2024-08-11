@@ -1,24 +1,14 @@
 import asyncio
 from datetime import datetime
-from threading import Thread
-import time
 from typing import Any, Callable
 import schedule
 import serial
 import serial.tools.list_ports
 
-try:
-    from ORM.loggers import Logger
-except:
-    import os
-    import sys
-    sys.path.append(os.getcwd())
-    from ORM.loggers import Logger
-
 class ArduinoCommunicator:
     '''Класс для отправки данных на ардуино'''
     def __init__(self, port: str, handler: Callable[[str, bytes, Any], str | None], handler_kwargs = None, startflag: str = "{", endflag: str = "}", 
-                 format_send: Callable[[Any], str] = None, logger: Logger = None, baudrate: int = 9600) -> None:
+                 format_send: Callable[[Any], str] = None, logger = None, baudrate: int = 9600) -> None:
         '''`port` - номер COM порта, `format_send` - функция, превращающая входные данные в строку, 
         `logger` - сохраняет ошибки и доп.информацию в БД, `baudrate` - частота'''
         self.connection = serial.Serial(port, baudrate)
@@ -85,7 +75,7 @@ class ArduinoCommunicator:
             if self.connection.in_waiting > 0:
                 start_symb = self.connection.read(1)
                 print("listener", start_symb.decode('utf-8'))
-                #print(ard.connection.port, start_symb.decode('utf-8'), ard.startflag)
+
                 if start_symb.decode('utf-8') == self.startflag:
                     response = self.connection.read_until(expected=self.endflag.encode())
                     #print(ard.connection.port, start_symb.decode('utf-8') + response.decode('utf-8'), start_symb + response)
@@ -94,7 +84,8 @@ class ArduinoCommunicator:
                     if response:
                         self.connection.write(response.encode())
                 else: self.connection.reset_input_buffer()
-    
+
     def close(self) -> None: 
         '''Закрывает соединение'''
         self.connection.close()
+

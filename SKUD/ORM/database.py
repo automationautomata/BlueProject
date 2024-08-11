@@ -11,7 +11,7 @@ class DatabaseABC(ABC):
     def establish_connection(self, rootpath: str) -> None:
         pass
     @abstractmethod
-    def establish_connection(self, properties: list[str] = [], dirpath: str = './') -> None:
+    def establish_connection(self) -> None:
         pass
     # Метод для создания базы или, при ее утрате, восстановления
     @abstractmethod
@@ -25,33 +25,34 @@ class DatabaseABC(ABC):
         pass
 
 class DatabaseConnection(DatabaseABC, Singleton):
-    def __init__(self, scriptpath: str, name: str, dirpath: str = ".\\") -> None:
+    def __init__(self, scriptpath: str, name: str, dirpath: str = os.getcwd()) -> None:
         '''`scriptpath` - путь к скрипту, создающему бд,
         `name` - название БД, `dirpath` - папка с БД'''
         self.__scriptpath = scriptpath
-        self.__name = name
-        self.__dirpath = dirpath
-        self._connection_ = {} #: dict[int, sqlite3.Connection] = {}
+        self.path = os.path.join(dirpath, name)
+        self._connections_ = {} #: dict[int, sqlite3.Connection] = {}
         
     def threadsafe_connect(self) -> sqlite3.Connection:
-        path = f"{self.__dirpath}{self.__name}"
         thread_id = threading.get_native_id()
-        if thread_id not in self._connection_.keys():
-            self._connection_[thread_id] = sqlite3.connect(path)        
-        return self._connection_[thread_id]
+        if thread_id not in self._connections_.keys():
+            print(self.path)
+            self._connections_[thread_id] = sqlite3.connect(self.path)        
+        try: 
+            self._connections_[thread_id].cursor()
+        except: 
+            self._connections_[thread_id] = sqlite3.connect(self.path)
+        return self._connections_[thread_id]
 
     def establish_connection(self) -> None:
         '''Устанавливает соединение c базой и, если БД отсутствует,
         то пересоздает ее на основе указанного скрипта.'''
-        path = f"{self.__dirpath}{self.__name}"
-        if not os.path.exists(path):
+        dir = os.path.dirname(self.path)
+        if not os.path.exists(dir):
+            if not os.path.exists(self.path):
+                os.mkdir(dir)
             self._createdatabase_()
         else: 
-            try: 
-                self.threadsafe_connect().cursor()
-            except: 
-                thread_id = threading.get_native_id()
-                self._connection_[thread_id] = sqlite3.connect(path)
+            self.threadsafe_connect()
 
     def _createdatabase_(self) -> None:
         '''Создает базу данных на основе скрипта.'''
@@ -93,7 +94,7 @@ class DatabaseConnection(DatabaseABC, Singleton):
 
     def close(self) -> None:
         '''Закрывает соединение с БД'''
-        for key in self._connection_.keys():
-            self._connection_[key].close()
-            del self._connection_[key]
+        for key in self._connections_.keys():
+            self._connections_[key].close()
+            del self._connections_[key]
     

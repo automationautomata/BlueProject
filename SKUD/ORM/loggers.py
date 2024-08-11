@@ -1,14 +1,9 @@
 from ORM.database import DatabaseConnection
-from ORM.entities.tables import RemoteSessions, VisitsHistory
+from ORM.tables import RemoteSessions, VisitsHistory
 from datetime import datetime
 
 class Logger(DatabaseConnection):
     '''Класс для установки соединения с БД логгером'''
-    __scriptpath = ".\\dbscripts\\logger_script.sql"
-    
-    def __init__(self, name: str, dirpath: str = "./") -> None:
-        '''`name` - название БД, `dirpath` - путь к БД.'''
-        super().__init__(Logger.__scriptpath, name, dirpath)
     
     def addlog(self, row: list[str]):
         '''Добавляет запись в таблицу истории посещений комнат. `row` - добавляемая строка'''
@@ -26,11 +21,6 @@ class Logger(DatabaseConnection):
 
 class VisitLogger(DatabaseConnection):
     '''Класс для установки соединения с БД посещений'''
-    __scriptpath = ".\\SKUD\\dbscripts\\visits_script.sql"
-
-    def __init__(self, name: str, dirpath: str = "./") -> None:
-        '''`name` - название БД, `dirpath` - путь к БД.'''
-        super().__init__(VisitLogger.__scriptpath, name, dirpath)
 
     def addvisit(self, row: VisitsHistory):
         '''Добавляет запись в таблицу истории посещений комнат. `row` - добавляемая строка'''

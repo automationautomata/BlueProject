@@ -2,10 +2,10 @@ import json
 from typing import Callable
 
 from ORM.database import DatabaseConnection
-from ORM.queries.templates import query_for_table
+from ORM.queries import query_for_table
 from remote.tools import Answer
 
-from intercom.auth_controller import Tokens
+from .auth_controller import Tokens
 
 
 class UiController:
