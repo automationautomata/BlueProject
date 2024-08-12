@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import logging
 import sqlite3
 import os
 import threading
@@ -31,6 +32,7 @@ class DatabaseConnection(DatabaseABC, Singleton):
         self.__scriptpath = scriptpath
         self.path = os.path.join(dirpath, name)
         self._connections_ = {} #: dict[int, sqlite3.Connection] = {}
+        self.backup = logging.Logger(f"{name}-backup", logging.FATAL)
         
     def threadsafe_connect(self) -> sqlite3.Connection:
         thread_id = threading.get_native_id()
@@ -78,6 +80,8 @@ class DatabaseConnection(DatabaseABC, Singleton):
         cursor = conn.cursor()
         result = cursor.execute(command, params)
         conn.commit()
+        if result:
+            self.backup.info('{'+f"\"SQL\": {command}; \"VALUES\": {params}"+'}')
         return result
         
     def table_cols(self, table: str):

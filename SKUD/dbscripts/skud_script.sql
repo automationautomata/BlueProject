@@ -76,9 +76,9 @@ AS select access_rules.room,
 
 --------------------------------------------------------------------------------    
 
-INSERT into cards (id, isSabotaged, date_time_begin) values (12, 0, strftime('%Y-%m-%d %H:%M:%S', datetime('now'))), 
+INSERT into cards (number, isSabotaged, date_time_begin) values (12, 0, strftime('%Y-%m-%d %H:%M:%S', datetime('now'))), 
                                                             (15, 0, strftime('%Y-%m-%d %H:%M:%S', datetime('now')));             
-INSERT into rooms (name, date_time) values ('office', strftime('%Y-%m-%d %H:%M:%S', datetime('now'))), 
+INSERT into rooms (name, date_time_begin) values ('office', strftime('%Y-%m-%d %H:%M:%S', datetime('now'))), 
                                            ('work'  , strftime('%Y-%m-%d %H:%M:%S', datetime('now'))),
                                            ('UI'    , strftime('%Y-%m-%d %H:%M:%S', datetime('now')));
                                                                    

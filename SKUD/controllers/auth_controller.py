@@ -1,12 +1,13 @@
 import json
+import logging
 from random import randint 
 from datetime import datetime, timedelta
 
 from ORM.database import DatabaseConnection
-from ORM.loggers import Logger, VisitLogger
+from ORM.loggers import VisitLogger
 from ORM.templates import condition_query
 from general.singleton import Singleton
-from remote.ui import Answer
+from remote.server import Answer
 
 class Tokens(Singleton):
     '''Класс для хранения токенов сессий'''
@@ -37,7 +38,7 @@ class Tokens(Singleton):
         
 class AuthenticationController:
     def __init__(self, remote_right: int, visits_db: VisitLogger, 
-                       skud_db: DatabaseConnection, Debug: bool = False) -> None:
+                       skud_db: DatabaseConnection, Debug: bool = False,  logger: logging.Logger = None) -> None:
         self.visits_db = visits_db
         self.skud_db = skud_db
         self.remote_right = remote_right
@@ -48,8 +49,9 @@ class AuthenticationController:
         sql = condition_query("access_rules", ["room"], f"right = {self.remote_right}")
         print(sql)
         self.remote_rooms = {row[0] for row in self.skud_db.execute_query(sql)}
+        self.logger = logger
 
-    def verificator(self, data) -> Answer:  
+    def authenticatior(self, data) -> Answer:  
         try:
             msg = json.loads(data)
             if msg['id'] in self.remote_rooms:
@@ -59,6 +61,7 @@ class AuthenticationController:
 
                 #### DEBUG ####
                 if self.Debug: print("data:", data, "card:", card)
+                if self.logger: self.logger.debug(f"data: {data}, card: {card}")
 
                 if len(card) == 1:
                     token = self.tokens.add(msg['id'])
@@ -71,4 +74,6 @@ class AuthenticationController:
             #### DEBUG ####
             if self.Debug: print("ERROR:", str(error))
 
+            if self.logger:
+                self.logger.warning(f"{error}; In AuthenticationController.authenticatior with data = {data}")
             return Answer(0, str(error))

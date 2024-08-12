@@ -1,14 +1,15 @@
 import json
+import logging
 
 from ORM.database import DatabaseConnection
 from ORM.tables import VisitsHistory
-from ORM.loggers import VisitLogger, Logger
+from ORM.loggers import VisitLogger
 from remote.tools import WebsoketClients
 from hardware.setting import arduions_configuring
 
 class AccessController:
     '''Класс для управления несолькими ардуино и взаимодействия с БД'''
-    def __init__(self, skud: DatabaseConnection, ports: list[str], visits_db: VisitLogger, logger: Logger = None, Debug: bool = False) -> None:
+    def __init__(self, skud: DatabaseConnection, ports: list[str], visits_db: VisitLogger, logger: logging.Logger = None, Debug: bool = False) -> None:
         '''`skud` - класс для соединения с БД скуда, `ports` - список портов, к которым подключены устройства, 
         `visits_db` - класс для соединения с БД инофрмации, полученной от устройств, 
         `logger` - класс для сохранения ошибок и дополнительной информации'''
@@ -18,10 +19,8 @@ class AccessController:
         self.visits_db.establish_connection()
 
         self.arduinos_therad, self.arduinos = arduions_configuring(ports, self.arduino_handler)
-        self.logger = logger
-        if self.logger:
-            self.logger.establish_connection()
 
+        self.logger = logger
         self.Debug = Debug
 
     def arduino_handler(self, port: str, data: bytes, **kwargs) -> None:
@@ -45,7 +44,7 @@ class AccessController:
 
         except BaseException as error:
             if self.logger:
-                self.logger.addlog(f"In AccessController.arduino_handler() with port = {port} and data = {data} ERROR: {error}")
+                self.logger.exception(f"{error}; In AccessController.arduino_handler() with port = {port} and data = {data}")
             
             #### DEBUG ####
             if self.Debug: print(error)

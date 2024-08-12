@@ -20,10 +20,10 @@ SKUD_SCRIPT_PATH = f"{ROOT_DIR}\\dbscripts\\skud_script.sql"
 VISITS_SCRIPT_PATH = f"{ROOT_DIR}\\dbscripts\\visits_script.sql"
 '''Путь к скрипту, создающему базу данных посещений'''
 
-ARDUINO_PORTS = ["COM6", "COM7"]
+ARDUINO_PORTS = ["COM7"]
 '''Список портов, к которым присоединены платы'''
 
 URL = "localhost", 8080
 '''Временный адрес для проверки работы вебсервера'''
 
-ROOM_PORT_MAP = {0: "COM6", 1:"COM7"}
+ROOM_PORT_MAP = {1:"COM7"}

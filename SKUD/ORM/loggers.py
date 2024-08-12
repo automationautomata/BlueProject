@@ -1,23 +1,5 @@
 from ORM.database import DatabaseConnection
 from ORM.tables import RemoteSessions, VisitsHistory
-from datetime import datetime
-
-class Logger(DatabaseConnection):
-    '''Класс для установки соединения с БД логгером'''
-    
-    def addlog(self, row: list[str]):
-        '''Добавляет запись в таблицу истории посещений комнат. `row` - добавляемая строка'''
-        conn = self.threadsafe_connect()
-        cursor = conn.cursor()
-        sql = "INSERT INTO projects(message, time) VALUES(?,?)"
-        time = datetime.now().isoformat()
-        fmt = lambda msg: (msg, time)
-        try:
-            cursor.execute(sql, list(map(fmt, row)))
-            conn.commit()
-            return True
-        except: 
-            return False
 
 class VisitLogger(DatabaseConnection):
     '''Класс для установки соединения с БД посещений'''
@@ -48,5 +30,3 @@ class VisitLogger(DatabaseConnection):
         except BaseException as error: 
             print("ERR", error)
             return False
-
-    
