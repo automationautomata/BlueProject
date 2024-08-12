@@ -58,23 +58,24 @@ class SkudApiRequsts(Singleton):
         except Exception as error:
             print("get ERR", error)
 
-    def fmt(self, action, data) -> dict:
-        return {"action": action, 
-                "data"  : json.dumps(data)}
+    def fmt(self, data) -> dict:
+        return { "data"  : json.dumps(data)}
     
     def get_table(self, table: str, start: int, order_column: str, order_type: bool) -> dict | None:
-        action = f"{table} query"
         data = {"start"       : start, 
                 "order_type"  : order_type, 
                 "order_column": order_column}
  
-        response = self.get(self.fmt(action,  data), "/ui")
+        response = self.get(self.fmt(data), f"/ui/{table}")
         try: 
             return response.json()
         except Exception as error:
             print("response:", response.text if response else "None", 
                   "ERR:", error)
-        
+            
+    def get_rights(self, getall=False):
+        return self.get(self.fmt({"all": getall}), "/ui/rights")
+    
     def authentication(self, key: int) -> tuple[bool, str]:
         data = json.dumps({"key": key, "id": self.id})
         response = self.get({"auth": data}, "/auth")
@@ -100,5 +101,6 @@ while True:
         print("err, ", api.authentication(12))
     else:
         print("mmmm")
+        print("req", api.get_rights())
         print("req", api.get_table("entities", 0, "card", False))
         print("ssss")

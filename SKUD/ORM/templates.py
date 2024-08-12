@@ -19,3 +19,6 @@ def condition_query(table: str, cols: list[str], condition: str):
 
 def sort_query(table: str):
     pass
+
+def insert(table: str, col_names):
+    return f'''INSERT INTO {table}({','.join(col_names)}) VALUES ({(len(col_names) - 1)*'?,' + '?'})'''

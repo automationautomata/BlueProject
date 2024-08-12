@@ -20,41 +20,41 @@ class AuthenticationHandler(tornado.web.RequestHandler):
 class QueryHandler(tornado.web.RequestHandler):
     '''Класс для обработки CRUD запросов'''
     def initialize(self, action: Actions) -> None:
-        self.actions = action.action_query_map()
+        self.actions = action.actions_map()
         self.verify = action.verify
 
     def get(self) -> None:
         headers = self.request.headers
         if self.verify(token=headers.get("X-Auth"), id=headers.get("X-Id")):
-            answer = self.actions[self.get_body_argument("action")](self.get_body_argument("data"))
+            answer = self.actions[self.get_argument()]["get"](self.get_body_argument("data"))
             print(answer.toJSON())
             self.write(answer.toJSON())
         
     def post(self) -> None:
         headers = self.request.headers
         if self.verify(token=headers.get("X-Auth"), id=headers.get("X-Id")):
-            answer = self.actions[self.get_body_argument("action")](self.get_body_argument("data"))
+            answer = self.actions["post"](self.get_body_argument("data"))
             self.set_header("Content-Type", "text/plain")
             self.write(answer.toJSON())
 
     def put(self) -> None:
         headers = self.request.headers
         if self.verify(token=headers.get("X-Auth"), id=headers.get("X-Id")):
-            answer = self.actions[self.get_body_argument("action")](self.get_body_argument("data"))
+            answer = self.actions["put"](self.get_body_argument("data"))
             self.set_header("Content-Type", "text/plain")
             self.write(answer.toJSON())
 
     def delete(self) -> None:
         headers = self.request.headers
         if self.verify(token=headers.get("X-Auth"), id=headers.get("X-Id")):
-            answer = self.actions[self.get_body_argument("action")](self.get_body_argument("data"))
+            answer = self.actions["put"](self.get_body_argument("data"))
             self.set_header("Content-Type", "text/plain")
             self.write(answer.toJSON())
 
 
 class Websoket(WebSocketHandler):
     def initialize(self, action: Actions) -> None:
-        self.actions = action.action_query_map()
+        self.actions = action.actions_map()
         self.verify = action.verify
         self.clients = WebsoketClients()
     
@@ -74,18 +74,20 @@ class Websoket(WebSocketHandler):
 
 
 def create_tornado_server(port: int, auth: Callable[[str], Answer],
-                          skud: Actions, visits: Actions, 
+                          api: dict[str, Actions], ws: Actions, 
                           isdaemon: bool = True) -> tuple[Thread, tornado.web.Application]:
     '''Создает поток, обрабатывыающий запросы от десктоп приложений.
-    `port` - номер сокета, skud - обрабатывает сообщения от клиента к БД СКУДа,
-    `visits` - обрабатывает сообщения от клиента к БД посещений,
+    `port` - номер сокета, 
+    `api` - обрабатывает сообщения от клиента по HTTP,
+    `ws` - обрабатывает сообщения по websocket,
     `auth` - функция, производящяя аутентификацию, 
     `isdaemon` - подчиненный ли поток по отношению к главному.'''
-    app = tornado.web.Application([
-        (r"/", AuthenticationHandler, dict(verificator=auth)),
-        (r"/ui", QueryHandler, dict(action=skud)),
-        (r"/wss", Websoket, dict(actions=visits))
-    ])
+    handlers = [(r"/auth", AuthenticationHandler, dict(verificator=auth)),
+                (r"/wss", Websoket, dict(actions=ws))]
+    for key, val in api:
+        handlers.append((key, QueryHandler, dict(action=val)))
+
+    app = tornado.web.Application(handlers)
     
     app.listen(port)
     return Thread(target=tornado.ioloop.IOLoop.current().start, daemon=isdaemon), app
