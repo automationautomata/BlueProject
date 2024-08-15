@@ -41,7 +41,63 @@ class SortingButton(Button):
         self.color = app.themes[app.current_theme]['Text']
         self.background_color = app.themes[app.current_theme]['Additionally'][2]
 
+class AddRecordButton(Button):
+    def __init__(self, **kwargs):
+        super(AddRecordButton, self).__init__(**kwargs)
+        self._update()
 
+    def _update(self, *args):
+        self.color = app.themes[app.current_theme]['Text']
+        self.background_color = app.themes[app.current_theme]['Additionally'][2]
+        self.disabled_background_color = app.themes[app.current_theme]['Additionally'][2]
+
+class EditRecordButton(Button):
+    def __init__(self, **kwargs):
+        super(EditRecordButton, self).__init__(**kwargs)
+        self._update()
+
+    def _update(self, *args):
+        self.color = app.themes[app.current_theme]['Text']
+        self.background_color = app.themes[app.current_theme]['Additionally'][2]
+
+class DeleteRecordButton(Button):
+    def __init__(self, **kwargs):
+        super(DeleteRecordButton, self).__init__(**kwargs)
+        self._update()
+
+    def _update(self, *args):
+        self.color = app.themes[app.current_theme]['Text']
+        self.background_color = app.themes[app.current_theme]['Additionally'][2]
+
+class CardsListButton(Button):
+    def __init__(self, **kwargs):
+        super(CardsListButton, self).__init__(**kwargs)
+        self._update()
+
+    def _update(self, *args):
+        self.color = app.themes[app.current_theme]['Text']
+        self.background_color = app.themes[app.current_theme]['Additionally'][2]
+        self.disabled_background_color = app.themes[app.current_theme]['Additionally'][2]
+
+class RoomsListButton(Button):
+    def __init__(self, **kwargs):
+        super(RoomsListButton, self).__init__(**kwargs)
+        self._update()
+
+    def _update(self, *args):
+        self.color = app.themes[app.current_theme]['Text']
+        self.background_color = app.themes[app.current_theme]['Additionally'][2]
+        self.disabled_background_color = app.themes[app.current_theme]['Additionally'][2]
+
+class RightsListButton(Button):
+    def __init__(self, **kwargs):
+        super(RightsListButton, self).__init__(**kwargs)
+        self._update()
+
+    def _update(self, *args):
+        self.color = app.themes[app.current_theme]['Text']
+        self.background_color = app.themes[app.current_theme]['Additionally'][2]
+        self.disabled_background_color = app.themes[app.current_theme]['Additionally'][2]
 
 class ExplorerButton(Button):
     def __init__(self, **kwargs):

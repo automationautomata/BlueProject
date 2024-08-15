@@ -1,31 +1,6 @@
 #:import Window kivy.core.window.Window
-#:import Factory kivy.factory.Factory
+#: include Classes/KivyPatterns.kv
 
-
-<ThemeButton>:
-    pos: (Window.width - 30, 0)
-    size: (30, 30)
-    background_normal: ''
-
-<DomainButton>:
-    pos: (Window.width - 125, 0)
-    size: (90, 30)
-    background_normal: ''
-
-<SortingButton>:
-    pos: (Window.width - 230, 0)
-    size: (100, 30)
-    background_normal: ''
-    on_press: Factory.SortingWindow().open_win()
-
-<ExplorerButton>:
-    size_hint: (None, None)
-    background_normal: ''
-
-<SortingWindow>:
-    pos: (Window.width * .05, Window.height * .05)
-    size_hint: (.9, .9)
-    title: 'Sorting'
 
 <MainScreen>:
 
@@ -68,7 +43,9 @@
                     _grid: entities_header_content
                     _rows: 1
                     _columns: 12
-                    _titles: ('card', 'isSabotagedCard', 'cardAddDate', 'cardDelDate', 'right', 'rightName', 'rightAddDate', 'rightDelDate', 'sid', 'type', 'entityAddDate', 'entityDelDate')
+
+                    _data_titles: ('Card', 'Name (sid)', 'Type', 'Right', 'Right ID', 'Is sabotaged card', 'Date the card was added', 'Date the card was deleted', 'Date the right was added', 'Date the right was deleted', 'Date the entity was added', 'Date the entity was deleted')
+                    _data_keys: ('card', 'sid', 'type', 'rightName', 'right', 'isSabotagedCard', 'cardAddDate', 'cardDelDate', 'rightAddDate', 'rightDelDate', 'entityAddDate', 'entityDelDate')
 
                     GridLayout:
                         id: entities_header_content
@@ -117,7 +94,9 @@
                     _grid: access_rules_header_content
                     _rows: 1
                     _columns: 10
-                    _titles: ('room', 'roomName', 'roomAddDate', 'roomDeleDate', 'right', 'rightName', 'rightAddDate', 'rightDelDate', 'ruleAddDate', 'ruleDelDate')
+
+                    _data_titles: ('room', 'roomName', 'roomAddDate', 'roomDeleDate', 'right', 'rightName', 'rightAddDate', 'rightDelDate', 'ruleAddDate', 'ruleDelDate')
+                    _data_keys: ('room', 'roomName', 'roomAddDate', 'roomDeleDate', 'right', 'rightName', 'rightAddDate', 'rightDelDate', 'ruleAddDate', 'ruleDelDate')
 
                     GridLayout:
                         id: access_rules_header_content
@@ -174,3 +153,29 @@
             id: sorting_button
             text: 'Sorting'
 
+        AddRecordButton:
+            id: add_record_button
+            text: 'Add'
+            disabled: root.ids.screen_manager.current == 'logs'
+
+        EditRecordButton:
+            id: edit_record_button
+            text: 'Edit'
+            disabled: root.ids.screen_manager.current == 'logs'
+
+        DeleteRecordButton:
+            id: delete_record_button
+            text: 'Delete'
+            disabled: root.ids.screen_manager.current == 'logs'
+
+        CardsListButton:
+            id: cards_list_button
+            text: 'Cards'
+
+        RoomsListButton:
+            id: rooms_list_button
+            text: 'Rooms'
+
+        RightsListButton:
+            id: rights_list_button
+            text: 'Rights'

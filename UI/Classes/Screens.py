@@ -18,7 +18,7 @@ test = {'data': [{'card': '15',
                 'cardAddDate': '2024-08-08 20:29:38',
                 'cardDelDate': None,
                 'right': 1,
-                'rightName':'admin',
+                'rightName': 'admin',
                 'rightAddDate': '2024-08-08 20:29:38',
                 'rightDelDate': None,
                 'sid': 5,
@@ -40,6 +40,9 @@ class MainScreen(Screen):
         self.ids.theme_button._update()
         self.ids.domain_button._update()
         self.ids.sorting_button._update()
+        self.ids.add_order_button._update()
+        self.ids.edit_order_button._update()
+        self.ids.delete_order_button._update()
         self.ids.go_entites_screen._update()
         self.ids.go_access_rules_screen._update()
         self.ids.go_logs_screen._update()

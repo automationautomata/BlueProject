@@ -12,6 +12,20 @@ from kivy.properties import StringProperty, ListProperty, NumericProperty
 global app
 
 
+class MyLabelHeader(Label):
+    def __init__(self, **kwargs):
+        super(MyLabelHeader, self).__init__(**kwargs)
+
+    def on_size(self, *args):
+        self.canvas.before.clear()
+        self.background_normal = ''
+        self.color = app.themes[app.current_theme]['Text']
+        with self.canvas.before:
+            Color(*app.themes[app.current_theme]['Base'][0])
+            Rectangle(pos=self.pos, size=self.size)
+            Color(*app.themes[app.current_theme]['Additionally'][0])
+            Rectangle(pos=(self.x + 1, self.y + 1), size=(self.width - 2, self.height - 2))
+
 class MyLabelTable(Label):
     def __init__(self, **kwargs):
         super(MyLabelTable, self).__init__(**kwargs)
@@ -27,26 +41,12 @@ class MyLabelTable(Label):
             Color(*app.themes[app.current_theme]['Additionally'][2])
             Rectangle(pos=(self.x + 1, self.y + 1), size=(self.width - 2, self.height - 2))
 
-class MyLabelHeader(Label):
-    def __init__(self, **kwargs):
-        super(MyLabelHeader, self).__init__(**kwargs)
-
-    def on_size(self, *args):
-        self.canvas.before.clear()
-        self.background_normal = ''
-        self.color = app.themes[app.current_theme]['Text']
-        with self.canvas.before:
-            Color(*app.themes[app.current_theme]['Base'][0])
-            Rectangle(pos=self.pos, size=self.size)
-            Color(*app.themes[app.current_theme]['Additionally'][0])
-            Rectangle(pos=(self.x + 1, self.y + 1), size=(self.width - 2, self.height - 2))
-
 class TableHeader(ScrollView):
     _grid = None
     _width = NumericProperty(1740)
     _height = NumericProperty(50)
     _columns_width = ListProperty()
-    _titles = ListProperty()
+    _data_titles = ListProperty()
 
     def __init__(self, **kwargs):
         super(TableHeader, self).__init__(**kwargs)
@@ -63,7 +63,7 @@ class TableHeader(ScrollView):
     def _update(self, *args):
         self._grid.clear_widgets()
         for col in range(self._columns):
-            label = MyLabelHeader(text=self._titles[col])
+            label = MyLabelHeader(text=self._data_titles[col])
             self._grid.add_widget(label)
 
     def scrolling(self, dist):
@@ -102,7 +102,7 @@ class TableContent(ScrollView):
         data = test['data']
         for record in range(len(data)):
             row = []
-            for col in self._header._titles:
+            for col in self._header._data_keys:
                 if data[record][col] is not None and str(data[record][col]):
                     row.append(str(data[record][col]))
                 else:
@@ -110,7 +110,7 @@ class TableContent(ScrollView):
             self.table_data.append(row)
 
         for empty in range(25 - len(self.table_data)):
-            self.table_data.append(' ' * len(self._header._titles))
+            self.table_data.append(' ' * len(self._header._data_keys))
 
         self._update()
 
