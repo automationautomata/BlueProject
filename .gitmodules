@@ -1,0 +1,3 @@
+[submodule "Card Controller"]
+	path = Card Controller
+	url = https://github.com/automationautomata/Card-Controller.git
