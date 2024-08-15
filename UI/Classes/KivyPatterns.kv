@@ -1,0 +1,113 @@
+#:import Window kivy.core.window.Window
+#:import Factory kivy.factory.Factory
+
+
+<ThemeButton>:
+    pos: (Window.width - 30, 0)
+    size: (30, 30)
+    background_normal: ''
+
+<DomainButton>:
+    pos: (Window.width - 125, 0)
+    size: (90, 30)
+    background_normal: ''
+    on_press: Factory.DomainWindow().open_win()
+
+<SortingButton>:
+    pos: (Window.width - 230, 0)
+    size: (100, 30)
+    background_normal: ''
+    on_press: Factory.SortingWindow().open_win()
+
+<AddRecordButton>:
+    pos: (0, 0)
+    size: (75, 30)
+    background_normal: ''
+    background_disabled_normal: ''
+    on_press: Factory.AddRecordWindow().open_win()
+
+<EditRecordButton>:
+    pos: (80, 0)
+    size: (75, 30)
+    background_normal: ''
+    background_disabled_normal: ''
+    on_press: Factory.EditRecordWindow().open_win()
+
+<DeleteRecordButton>:
+    pos: (160, 0)
+    size: (100, 30)
+    background_normal: ''
+    background_disabled_normal: ''
+    on_press: Factory.DeleteRecordWindow().open_win()
+
+<CardsListButton>:
+    pos: (300, 0)
+    size: (75, 30)
+    background_normal: ''
+    background_disabled_normal: ''
+    on_press: Factory.CardsListWindow().open_win()
+
+<RoomsListButton>:
+    pos: (380, 0)
+    size: (75, 30)
+    background_normal: ''
+    background_disabled_normal: ''
+    on_press: Factory.RoomsListWindow().open_win()
+
+<RightsListButton>:
+    pos: (460, 0)
+    size: (75, 30)
+    background_normal: ''
+    background_disabled_normal: ''
+    on_press: Factory.RightsListWindow().open_win()
+
+<ExplorerButton>:
+    size_hint: (None, None)
+    background_normal: ''
+
+<DomainWindow>:
+    pos: (Window.width * .05, Window.height * .05)
+    size_hint: (.9, .9)
+    title: 'Domain'
+
+<SortingWindow>:
+    pos: (Window.width * .05, Window.height * .05)
+    size_hint: (.9, .9)
+    title: 'Sorting'
+
+<AddRecordWindow>:
+    pos: (Window.width * .05, Window.height * .05)
+    size_hint: (.3, .6)
+    title: 'Add record'
+    auto_dismiss: False
+
+    RelativeLayout:
+        id: main_area
+        pos: self.pos
+        size_hint: self.size_hint
+
+<EditRecordWindow>:
+    pos: (Window.width * .05, Window.height * .05)
+    size_hint: (.9, .9)
+    title: 'Edit record'
+
+<DeleteRecordWindow>:
+    pos: (Window.width * .05, Window.height * .05)
+    size_hint: (.9, .9)
+    title: 'Delete record'
+
+
+<CardsListWindow>:
+    pos: (Window.width * .05, Window.height * .05)
+    size_hint: (.3, .6)
+    title: 'Cards list'
+
+<RoomsListWindow>:
+    pos: (Window.width * .05, Window.height * .05)
+    size_hint: (.3, .6)
+    title: 'Rooms list'
+
+<RightsListWindow>:
+    pos: (Window.width * .05, Window.height * .05)
+    size_hint: (.3, .6)
+    title: 'Rights list'
