@@ -1,3 +1,9 @@
+<<<<<<< HEAD
 [submodule "UI"]
 	path = UI
 	url = https://github.com/automationautomata/ACS-UI.git
+=======
+[submodule "Card Controller"]
+	path = Card Controller
+	url = https://github.com/automationautomata/Card-Controller.git
+>>>>>>> master
