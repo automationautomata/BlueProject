@@ -1,40 +1,52 @@
 from ORM.database import DatabaseConnection
-from ORM.entities.tables import VisitsHistory
+from ORM.tables import RemoteSessions, VisitsHistory
 from datetime import datetime
 
 class Logger(DatabaseConnection):
-    __scriptpath = ".\\dbscripts\\logger_script.sql"
-    def __init__(self, name: str, dirpath: str = "./") -> None:
-        super().__init__(Logger.__scriptpath, name, dirpath)
+    '''Класс для установки соединения с БД логгером'''
     
-    def addlog(self, messages: list[str]):
-        cursor = self._connection_.cursor()
+    def addlog(self, row: list[str]):
+        '''Добавляет запись в таблицу истории посещений комнат. `row` - добавляемая строка'''
+        conn = self.threadsafe_connect()
+        cursor = conn.cursor()
         sql = "INSERT INTO projects(message, time) VALUES(?,?)"
         time = datetime.now().isoformat()
         fmt = lambda msg: (msg, time)
         try:
-            cursor.execute(sql, list(map(fmt, messages)))
-            self._connection_.commit()
+            cursor.execute(sql, list(map(fmt, row)))
+            conn.commit()
             return True
         except: 
             return False
 
 class VisitLogger(DatabaseConnection):
-    __scriptpath = ".\\dbscripts\\visits_script.sql"
-    def __init__(self, name: str, dirpath: str = "./") -> None:
-        super().__init__(VisitLogger.__scriptpath, name, dirpath)
+    '''Класс для установки соединения с БД посещений'''
 
-    def addrow(self, message: VisitsHistory):
-        cursor = self._connection_.cursor()
+    def addvisit(self, row: VisitsHistory):
+        '''Добавляет запись в таблицу истории посещений комнат. `row` - добавляемая строка'''
+        conn = self.threadsafe_connect()
+        cursor = conn.cursor()
         sql = "INSERT INTO visits_history (port, message, pass_time) VALUES (?,?,?);"
-        data = (message.port, message.message, message.pass_time)
+        data = (row.port, row.message, row.pass_time)
         try: 
             cursor.execute(sql, data)
-            self._connection_.commit()
+            conn.commit()
             return True
-        except NameError: 
-            print("ERR", NameError)
+        except BaseException as error: 
+            print("ERR", error)
             return False
-    
+        
+    def addsession(self, row: RemoteSessions):
+        conn = self.threadsafe_connect()
+        cursor = conn.cursor()
+        sql = "INSERT INTO remote_sessions (address, token, event, message, sign_in_time) VALUES (?,?,?);"
+        data = (row.address, row.token, row.event, row.message, row.sign_in_time)
+        try: 
+            cursor.execute(sql, data)
+            conn.commit()
+            return True
+        except BaseException as error: 
+            print("ERR", error)
+            return False
 
     
