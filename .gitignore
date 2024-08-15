@@ -1,4 +1,5 @@
 **/venv
+**/Card Controller
 index.html
 requirements.txt
 app.py
