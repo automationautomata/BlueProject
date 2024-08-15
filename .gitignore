@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 **/venv
 index.html
 requirements.txt
@@ -6,3 +7,11 @@ Dockerfile
 **/.vscode
 **/__pycache__
 **/DB
+=======
+**/venv
+**/Card Controller
+index.html
+requirements.txt
+app.py
+Dockerfile
+>>>>>>> dev-UI
