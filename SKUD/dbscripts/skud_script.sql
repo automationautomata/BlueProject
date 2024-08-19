@@ -1,7 +1,8 @@
 -------------------------TABLES-------------------------
 
 CREATE TABLE cards (
-    id VARCHAR(4) PRIMARY KEY,
+    id INT PRIMARY KEY AUTOINCREMENT NOT NULL,
+    number INT NOT NULL,
     isSabotaged VARCHAR(1) NOT NULL,
     date_time_begin TEXT NOT NULL,
     date_time_end TEXT
@@ -10,7 +11,9 @@ CREATE TABLE cards (
 CREATE TABLE rooms (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     name TEXT NOT NULL,
-    date_time TEXT NOT NULL
+    date_time_begin TEXT NOT NULL,
+    date_time_end TEXT, 
+    UNIQUE(name)
 );
 CREATE TABLE rights (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
