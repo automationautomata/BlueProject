@@ -15,7 +15,7 @@ from remote.tools import Answer
 
 class QueryHandler(tornado.web.RequestHandler):
     def initialize(self, action) -> None:
-        self.actions = action.action_query_map()
+        self.actions = action.actions_map()
         self.verify = action.verify
 
     def get(self) -> None:

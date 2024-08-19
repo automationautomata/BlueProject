@@ -7,5 +7,3 @@ Dockerfile
 **/.vscode
 **/__pycache__
 **/DB
-tester.py
-h.py

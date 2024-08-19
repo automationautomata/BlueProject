@@ -50,7 +50,7 @@ class SkudApiRequsts(Singleton):
 
     def get(self, body: Any, path="") -> requests.Response | None:
         try:
-            response = requests.get(self.url+path, data=body, auth=TokenAuth(self.token, self.id))
+            response = requests.get(self.url+path,   data=body, auth=TokenAuth(self.token, self.id))
             if response.status_code == 200:
                 return response
             else:
