@@ -1,8 +1,8 @@
 -------------------------TABLES-------------------------
 
 CREATE TABLE cards (
-    id INT PRIMARY KEY AUTOINCREMENT NOT NULL,
-    number INT NOT NULL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    number INTEGER NOT NULL,
     isSabotaged VARCHAR(1) NOT NULL,
     date_time_begin TEXT NOT NULL,
     date_time_end TEXT
@@ -46,6 +46,7 @@ CREATE TABLE entities (
 
 CREATE VIEW entities_view 
 AS select card, 
+          cards.number as cardsNumber,  
           cards.isSabotaged as isSabotagedCard,  
           cards.date_time_begin as cardAddDate, 
           cards.date_time_end as cardDelDate, 

@@ -1,5 +1,5 @@
 import json
-import random as rnd
+from random import randint 
 from datetime import datetime, timedelta
 
 from ORM.database import DatabaseConnection
@@ -24,7 +24,7 @@ class Tokens(Singleton):
         return False         
     def add(self, id: str | int) -> int:
         '''Генерирует новый токен с `id`'''
-        token = rnd.randint(0, self.__randmax)
+        token = randint(0, self.__randmax)
         self.__tokens[id] = (token, datetime.now())
         return token
     

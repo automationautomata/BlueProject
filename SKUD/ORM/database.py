@@ -84,6 +84,10 @@ class DatabaseConnection(DatabaseABC, Singleton):
         sql = f"SELECT c.name FROM pragma_table_info('{table}') as c;"
         return list(map(lambda row: row[0], self.execute_query(sql)))
     
+    def table_pk(self, table: str):
+        sql = f"select info.name from pragma_table_info('{table}') as info WHERE info.pk = 1"
+        return self.execute_query(sql)[0]
+
     def rows_to_dicts(self, col_names: list[str], rows: list[tuple]) -> list[dict]:
         data = []
         for row in rows:
