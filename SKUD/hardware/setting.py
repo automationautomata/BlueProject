@@ -25,11 +25,11 @@ def create_listeners_thread(arduinos: list[ArduinoCommunicator],
     return thread
 
 def arduions_configuring(ports: list[str], 
-                        handler: Callable[[bytes], str], handler_kwargs=None) -> tuple[Thread, dict[str, ArduinoCommunicator]]: 
+                        handler: Callable[[bytes], str], isdaemon=True, handler_kwargs=None) -> tuple[Thread, dict[str, ArduinoCommunicator]]: 
     '''Настройка группы адруино, подключенных к портам из `ports` и с обработчиком входных данных `handler`,
     `handler_kwargs` - его аргументы'''
     arduinos = {}
     for port in ports:
         arduinos[port] = ArduinoCommunicator(port=port, handler=handler, handler_kwargs=handler_kwargs)
-    thread = create_listeners_thread(list(arduinos.values()))
+    thread = create_listeners_thread(list(arduinos.values()), isdaemon=isdaemon)
     return thread, arduinos

@@ -9,7 +9,7 @@ from hardware.setting import arduions_configuring
 
 class AccessController:
     '''Класс для управления несолькими ардуино и взаимодействия с БД'''
-    def __init__(self, skud: DatabaseConnection, ports: list[str], visits_db: VisitLogger, logger: logging.Logger = None, Debug: bool = False) -> None:
+    def __init__(self, skud: DatabaseConnection, ports: list[str], visits_db: VisitLogger, isdaemon: bool = True, logger: logging.Logger = None, Debug: bool = False) -> None:
         '''`skud` - класс для соединения с БД скуда, `ports` - список портов, к которым подключены устройства, 
         `visits_db` - класс для соединения с БД инофрмации, полученной от устройств, 
         `logger` - класс для сохранения ошибок и дополнительной информации'''
@@ -18,7 +18,7 @@ class AccessController:
         self.visits_db = visits_db
         self.visits_db.establish_connection()
 
-        self.arduinos_therad, self.arduinos = arduions_configuring(ports, self.arduino_handler)
+        self.arduinos_therad, self.arduinos = arduions_configuring(ports, self.arduino_handler, isdaemon=isdaemon)
 
         self.logger = logger
         self.Debug = Debug

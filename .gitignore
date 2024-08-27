@@ -7,4 +7,5 @@ Dockerfile
 **/.vscode
 **/__pycache__
 **/DB
-
+**/log
+**/backup

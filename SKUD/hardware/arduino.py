@@ -75,7 +75,7 @@ class ArduinoCommunicator:
             #print(self.connection.port)  
             if self.connection.in_waiting > 0:
                 start_symb = self.connection.read(1)
-                print("listener", start_symb.decode('utf-8'))
+                #print("listener", start_symb.decode('utf-8'))
 
                 if start_symb.decode('utf-8') == self.startflag:
                     response = self.connection.read_until(expected=self.endflag.encode())

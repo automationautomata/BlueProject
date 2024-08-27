@@ -8,6 +8,9 @@ ROOT_DIR = os.getcwd()
 DB_DIR = f"{ROOT_DIR}\\DB"
 '''Путь к папке с БД'''
 
+BACKUP_DIR = f"{ROOT_DIR}\\backup"
+'''Путь к папке с бекапами БД'''
+
 SKUD_DB_NAME = "SKUD.db"
 '''Название базы данных СКУДа'''
 
@@ -26,4 +29,4 @@ ARDUINO_PORTS = ["COM7"]
 URL = "localhost", 8080
 '''Временный адрес для проверки работы вебсервера'''
 
-ROOM_PORT_MAP = {1:"COM7"}
+ROOM_PORT_MAP = {0:"COM7"}

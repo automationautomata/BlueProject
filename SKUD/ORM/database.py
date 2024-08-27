@@ -26,14 +26,23 @@ class DatabaseABC(ABC):
         pass
 
 class DatabaseConnection(DatabaseABC, Singleton):
-    def __init__(self, scriptpath: str, name: str, dirpath: str = os.getcwd()) -> None:
+    def __init__(self, scriptpath: str, name: str, dirpath: str = os.getcwd(), backup_path: str = f"{os.getcwd()}/log/") -> None:
         '''`scriptpath` - путь к скрипту, создающему бд,
         `name` - название БД, `dirpath` - папка с БД'''
         self.__scriptpath = scriptpath
         self.path = os.path.join(dirpath, name)
         self._connections_ = {} #: dict[int, sqlite3.Connection] = {}
-        self.backup = logging.Logger(f"{name}-backup", logging.FATAL)
-        
+        self.backup = logging.getLogger(f"{name}-backup")
+
+        self.backup.setLevel(logging.INFO)
+        if not os.path.exists(backup_path):
+            os.makedirs(backup_path)
+        fh = logging.FileHandler(f"{backup_path}{name}-backup.log")
+
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        fh.setFormatter(formatter)
+        self.backup.addHandler(fh)
+
     def threadsafe_connect(self) -> sqlite3.Connection:
         thread_id = threading.get_native_id()
         if thread_id not in self._connections_.keys():
@@ -50,8 +59,8 @@ class DatabaseConnection(DatabaseABC, Singleton):
         то пересоздает ее на основе указанного скрипта.'''
         dir = os.path.dirname(self.path)
         if not os.path.exists(dir):
-            if not os.path.exists(self.path):
-                os.mkdir(dir)
+            os.makedirs(dir)
+        if not os.path.exists(self.path):           
             self._createdatabase_()
         else: 
             self.threadsafe_connect()
