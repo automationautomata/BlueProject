@@ -1,8 +1,5 @@
 import json
-from multiprocessing import Process
 import os
-import subprocess
-import time
 import click
 
 from general.config import (ENABLED_PATH, GLOBAL_SETTINGS_PATH, 
@@ -14,15 +11,30 @@ def cli(): pass
 
 @cli.command(name="clear")
 @click.argument("name", type=str)
-def clear_place(name): 
-    '''Удаляет БД и бекапы пользователя с name'''
+@click.option("-b", "--backup", type=bool,
+    help="Удалить вместе с бекапами.",
+    is_flag=True, flag_value=True
+)
+def clear_place(name, backup): 
+    '''Удаляет БД места с названием name'''
     try:
         click.echo()
         click.echo("Are you sure ? (Yes/No)", end=" ")
         if input().replace(" ", "") != "Yes":
-            os.remove(f"{DB_DIR}\\{name}")
-            os.remove(f"{BACKUP_DIR}\\{name}")
-        click.echo()
+            with open(GLOBAL_SETTINGS_PATH, "r+", encoding="utf8") as file:
+                raw = file.read()
+                if raw != "":
+                    globals_settings = json.loads(raw)
+                else: globals_settings = {}
+                del globals_settings[name]
+                file.seek(0)
+                file.write(json.dumps(globals_settings))
+                file.truncate()
+            os.remove(os.path.join(DB_DIR, name))
+            if backup:
+                os.remove(os.path.join(BACKUP_DIR, name))
+
+        click.echo("Done")
     except BaseException as error:
         click.echo(f"\nERROR: {error}\n")
 
