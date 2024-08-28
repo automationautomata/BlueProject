@@ -25,10 +25,10 @@ class DatabaseABC(ABC):
     def close(self) -> None: 
         pass
 
-class DatabaseConnection(DatabaseABC, Singleton):
-    def __init__(self, scriptpath: str, name: str, dirpath: str = os.getcwd(), backup_path: str = f"{os.getcwd()}/log/") -> None:
+class DatabaseConnection(DatabaseABC):
+    def __init__(self, scriptpath: str, name: str, dirpath: str = os.getcwd(), backup_path: str = os.path.join(os.getcwd(), "backup.log")) -> None:
         '''`scriptpath` - путь к скрипту, создающему бд,
-        `name` - название БД, `dirpath` - папка с БД'''
+        `name` - название БД, `dirpath` - папка с БД, `backup_path` - путь к бекапу БД.'''
         self.__scriptpath = scriptpath
         self.path = os.path.join(dirpath, name)
         self._connections_ = {} #: dict[int, sqlite3.Connection] = {}
@@ -37,7 +37,7 @@ class DatabaseConnection(DatabaseABC, Singleton):
         self.backup.setLevel(logging.INFO)
         if not os.path.exists(backup_path):
             os.makedirs(backup_path)
-        fh = logging.FileHandler(f"{backup_path}{name}-backup.log")
+        fh = logging.FileHandler(os.path.join(backup_path, f"{name}-backup.log"))
 
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         fh.setFormatter(formatter)

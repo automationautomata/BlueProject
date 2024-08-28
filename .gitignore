@@ -8,4 +8,7 @@ Dockerfile
 **/__pycache__
 **/DB
 **/log
-**/backup
+**/backups
+tester.py
+h.py
+.log

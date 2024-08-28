@@ -65,7 +65,8 @@ class UiController:
                 col_names.append(key)
                 vals.append(val)
             pk = self.skud_db.table_pk("table")
-            sql = update(table, col_names, f"{pk} = {updated["key"]}")
+            key = updated["key"]
+            sql = update(table, col_names, f"{pk} = {key}")
             res = self.skud_db.execute_query(sql)
             print(res)  
             return Answer("", "")

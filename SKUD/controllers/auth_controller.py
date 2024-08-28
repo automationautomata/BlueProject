@@ -23,13 +23,13 @@ class Tokens(Singleton):
             val = self.__tokens[id]
             return val[0] == token and val[1] - now <= self.duration
         return False         
-    def add(self, id: str | int) -> int:
+    def add(self, id):#: str | int) -> int:
         '''Генерирует новый токен с `id`'''
         token = randint(0, self.__randmax)
         self.__tokens[id] = (token, datetime.now())
         return token
     
-    def remove(self, id: str | int) -> bool:
+    def remove(self, id):#: str | int) -> bool:
         '''Удаление токена'''
         if id in self.__tokens:
             del self.__tokens[id]

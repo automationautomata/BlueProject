@@ -12,7 +12,8 @@ def getportsinfo() -> str:
     getinfo = lambda port: '{'+f"\"Port\": \"{port.device}\",\
                                  \"Description\": \"{port.description}\", \
                                  \"Manufacturer\": \"{port.manufacturer}\""+'}'
-    return '{'+f"{',\n'.join(getinfo(port) for port in ports)}"+'}'
+    ports = ',\n'.join(getinfo(port) for port in ports)
+    return '{'+f"{ports}"+'}'
 
 def create_listeners_thread(arduinos: list[ArduinoCommunicator], 
                             start_sleep_time: int = 0,  delta: int = 0.001, isdaemon: bool = True) -> Thread:

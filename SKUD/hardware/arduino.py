@@ -8,7 +8,7 @@ import serial.tools.list_ports
 
 class ArduinoCommunicator:
     '''Класс для отправки данных на ардуино'''
-    def __init__(self, port: str, handler: Callable[[str, bytes, Any], str | None], handler_kwargs = None, startflag: str = "{", endflag: str = "}", 
+    def __init__(self, port: str, handler: Callable[[str, bytes, Any], str], handler_kwargs = None, startflag: str = "{", endflag: str = "}", 
                  format_send: Callable[[Any], str] = None, logger: logging.Logger = None, baudrate: int = 9600) -> None:
         '''`port` - номер COM порта, `format_send` - функция, превращающая входные данные в строку, 
         `logger` - сохраняет ошибки и доп.информацию в БД, `baudrate` - частота'''
@@ -53,7 +53,7 @@ class ArduinoCommunicator:
                 self.logger.exception(f"{error}; In ArduinoCommunicator.communicate() with input data: {data}")
             print(error)
 
-    def write(self, data: str) -> str | None:
+    def write(self, data: str):# -> str | None:
         '''Отправляет данные в формате строки на ардуино и возвращает ответ от него, 
         если соединение закрыто, то открывает его заново'''
         try:

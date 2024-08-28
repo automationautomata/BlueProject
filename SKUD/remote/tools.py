@@ -40,7 +40,7 @@ class WebsoketClients(Singleton):
         self.__ws_clients[key] = client
         return key 
     
-    def __item__(self, key: int) -> WebSocketHandler | None:
+    def __item__(self, key: int): #-> WebSocketHandler | None:
         '''Получить соединение по номеру. `key` - ключ.'''
         if key in self.__ws_clients:
             return self.__ws_clients[key]
