@@ -44,7 +44,6 @@ class WebsoketClients(Singleton):
         '''Получить соединение по номеру. `key` - ключ.'''
         if key in self.__ws_clients:
             return self.__ws_clients[key]
-        return None
     
     def remove(self, key: int) -> bool:
         '''Удалить соединение из списка. `key` - ключ.'''

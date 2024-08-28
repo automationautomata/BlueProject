@@ -21,4 +21,5 @@ def insert(table: str, col_names: list[str]):
     return f'''INSERT INTO {table}({','.join(col_names)}) VALUES ({(len(col_names) - 1)*'?,' + '?'});'''
 
 def update(table: str, col_names: list[str], cond: str):
-    return f'''UPDATE {table} SET {' = ?\n'.join(col_names)} WHERE {cond};'''
+    str_cols = ' = ?\n'.join(col_names)
+    return f'''UPDATE {table} SET {str_cols} WHERE {cond};'''

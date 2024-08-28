@@ -37,10 +37,10 @@ class Websoket(WebSocketHandler):
         self.clients.remove(self.id)
         print("WebSocket closed")
 
-type Router = list[tuple[str, Any] | tuple[str, Any, dict]]
+#type Router = list[tuple[str, Any] | tuple[str, Any, dict]]
 
 def create_tornado_server(port: int, 
-                          router: Router,  
+                          router, #: Router,  
                           auth: Callable[[str], Answer],
                           ws_actions: Any = None,
                           isdaemon: bool = True) -> tuple[Thread, tornado.web.Application]:

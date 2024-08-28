@@ -1,6 +1,7 @@
 import json
 from multiprocessing import Process
 import os
+import subprocess
 import time
 import click
 
@@ -81,7 +82,7 @@ def skud(settings, name):
     print("sss")
 
 
-@cli.command(name="start")
+@cli.command(name="create")
 @click.argument("name", nargs=1, type=str)
 @click.argument("settings_path", nargs=1,
     type=click.Path(exists=True, dir_okay=False, readable=True)
@@ -90,36 +91,65 @@ def skud(settings, name):
     help="Вывод дополнительной инфоррмации на экран.",
     is_flag=True, flag_value=True
 )
-def start(name, settings_path, debug):
+def create(name, settings_path, debug):
     '''Запустить СКУД с названием name или создать с его, если он не существует \n
         settings_path - путь к файлу с настройками СКУДа, \n
         debug - Вывод дополнительной инфоррмации на экран.'''
     if not settings_path: return
 
-    settings = {} 
+    keys = {"ROOM_PORT_MAP", "PORT"} 
     try:
         with open(settings_path, mode="r+", encoding="utf8") as file:
-            script = file.read()
-        settings = json.loads(script)
+            settings: dict = json.loads(file.read())
+        if settings.keys() == keys:
+            click.echo("Settings error")
+            click.echo("Settings contains incorrect keys")
+            click.echo("The system has not been created")
+            return
+        with open(os.path.join(os.getcwd(), "global-settings.json"), "w+") as file:
+            globals_settings = json.loads(file.read())
+            globals_settings[name] = settings
+            file.write(json.dumps(globals_settings))
+
     except BaseException as error:
         click.echo("Settings error")
         click.echo(error)
         click.echo("The system has not been created")
 
-    settings["ROOM_PORT_MAP"] = ROOM_PORT_MAP
-    settings["PORT"] = URL[1]
-
-
-
-
-
-    p1 = Process(target=skud, args=(settings, name,), name=f"skud-{name}", daemon=False)
     
-    print("s111")
-    p1.start()
-    time.sleep(3)
-    print("s22")
-    #p1.join()
+
+@cli.command(name="start")
+@click.argument("names", required=False, multiple=True, type=str)
+@click.option("--all", type=bool, help="Для всех пользователей.",
+    is_flag=True, flag_value=True
+)
+def start(names="", all=False):
+    try:
+        if names == "": 
+            click.echo("Empty list of users.")
+            return
+        else:
+            enabled = names.split('\n')
+
+        if all:
+            with open(os.path.join(os.getcwd(), "global-settings.json"), "w+") as file:
+                globals_settings: dict = json.loads(file.read())
+                enabled = globals_settings.keys()
+
+        click.echo(enabled)
+        with open(os.path.join(os.getcwd(), "enabled"), "w+") as file:
+            file.write('\n'.join(names))
+
+        from systemd_service import Service
+        daemon = Service("skud-service")
+        try: daemon.enable()
+        except: pass
+        daemon.restart()
+    except BaseException as error:
+        click.echo("Start error")
+        click.echo(error)
+        click.echo("The system has not been started")
+
 ##### Wiegand ######
 
 if __name__ == '__main__':

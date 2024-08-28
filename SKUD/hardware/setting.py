@@ -1,4 +1,5 @@
 import asyncio
+import threading
 import serial, serial.tools.list_ports
 from typing import Callable
 from threading import Thread
@@ -21,6 +22,8 @@ def create_listeners_thread(arduinos: list[ArduinoCommunicator],
     async def ini():
         tasks = [asyncio.create_task(ard.listener(start_sleep_time + ind*delta)) for ind, ard in enumerate(arduinos)]
         await asyncio.gather(*tasks)
+        print(f"Service {threading.get_native_id()} restarted.")
+
     thread = Thread(target=lambda:asyncio.run(ini()), daemon=isdaemon)
     return thread
 
