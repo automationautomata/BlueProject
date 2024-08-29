@@ -18,10 +18,10 @@ class UiController:
 
         self.tokens = Tokens()
 
-    def table_query(self, table: str, data: str, is_null: True) -> Answer:
+    def table_query(self, table: str, data: str, is_null: False) -> Answer:
         '''Запрос к таблице `table`, `data` - параметры запроса. возвращает ответ Answer, где data - спиоск'''
         try: 
-            params = sort_query(json.loads(data))
+            params = json.loads(data)
             col_names = self.skud_db.table_cols(table)
             interval = (params["start"], 100 + params["start"])
             if is_null:
@@ -89,17 +89,26 @@ class SkudQueryHandler(tornado.web.RequestHandler):
     def initialize(self, uicontroller: UiController) -> None:
         self.controller = uicontroller
 
-    def get(self) -> None:
+    def check(self, table):
+        tables = {"rights", "cards", "rooms", "entities_view", "access_rules_view"}
+        return table in tables
+
+    def get(self, table) -> None:
+        print("eee")
+        if not self.check(table): return
         headers = self.request.headers
         if self.controller.verify(token=headers.get("X-Auth"), id=headers.get("X-Id")):
-            table = self.get_argument()
             data = self.get_body_argument("params")
-            is_null = self.get_body_argument("null")
+            is_null = False
+            if "NULL" in self.request.body_arguments.keys():
+                if self.get_body_argument("params") == "True": 
+                    is_null = True
+            print(data, is_null)
             answer = self.controller.table_query(table, data, is_null)
             print(answer.toJSON())
             self.write(answer.toJSON())
         
-    def post(self) -> None:
+    def post(self, table) -> None:
         headers = self.request.headers
         if self.controller.verify(token=headers.get("X-Auth"), id=headers.get("X-Id")):
             table = self.get_argument()
@@ -108,7 +117,7 @@ class SkudQueryHandler(tornado.web.RequestHandler):
             print(answer.toJSON())
             self.write(answer.toJSON())
             
-    def put(self) -> None:
+    def put(self, table) -> None:
         headers = self.request.headers
         if self.controller.verify(token=headers.get("X-Auth"), id=headers.get("X-Id")):
             table = self.get_argument()
@@ -117,7 +126,7 @@ class SkudQueryHandler(tornado.web.RequestHandler):
             print(answer.toJSON())
             self.write(answer.toJSON())
 
-    def delete(self) -> None:
+    def delete(self, table) -> None:
         headers = self.request.headers
         if self.controller.verify(token=headers.get("X-Auth"), id=headers.get("X-Id")):
             answer = self.actions["put"](self.get_body_argument("data"))

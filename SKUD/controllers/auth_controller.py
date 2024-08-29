@@ -55,12 +55,13 @@ class AuthenticationController:
         try:
             msg = json.loads(data)
             if msg['id'] in self.remote_rooms:
-                sql = condition_query("entities", ["card"], 
-                                     f"right = {self.remote_right} and card = {msg['key']}")
+                sub_sql = condition_query("cards", ['*'], f"number = {msg['key']}")[0:-1]
+                sql = condition_query(f"entities inner join ({sub_sql}) as c on entities.card = c.id", ["c.number"], 
+                                     f"right = {self.remote_right}")
+                
                 card = self.skud_db.execute_query(sql) 
-
                 #### DEBUG ####
-                if self.Debug: print("data:", data, "card:", card)
+                if self.Debug: print("data:", data, "number:", card)
                 if self.logger: self.logger.debug(f"data: {data}, card: {card}")
 
                 if len(card) == 1:
