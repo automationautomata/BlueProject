@@ -62,7 +62,7 @@ AS select card,
                         inner join rights on entities.right = rights.id;
 
 CREATE VIEW access_rules_view 
-AS select access_rules.room, 
+AS select room, 
           rooms.name as roomName,  
           rooms.date_time_begin as roomAddDate, 
           access_rules.right, 
