@@ -18,8 +18,8 @@ def cli(): pass
 def clear_place(name, backup): 
     '''Удаляет БД места с названием name'''
     try:
-        click.echo()
         click.echo("Are you sure ? (Yes/No)", end=" ")
+
         if input().replace(" ", "") != "Yes":
             with open(GLOBAL_SETTINGS_PATH, "r+", encoding="utf8") as file:
                 raw = file.read()
@@ -135,6 +135,11 @@ def start(names, all=False):
         click.echo("Start error")
         click.echo(error)
         click.echo("The system has not been started")
+
+
+def clear_all():
+    os.remove(DB_DIR)
+    os.remove(BACKUP_DIR)
 
 ##### Wiegand ######
 

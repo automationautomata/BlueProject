@@ -47,10 +47,10 @@ def start(settings, name):
     visits_db = VisitLogger(name=f"{name}-{VISITS_DB_NAME}", dirpath=os.path.join(DB_DIR, name), 
                             scriptpath=VISITS_SCRIPT_PATH, backup_path=os.path.join(BACKUP_DIR, name))
 
-    ac = AccessController(skud=skud_db, ports=settings["ROOM_PORT_MAP"].values(),
-                         visits_db=visits_db, isdaemon=False)
+    # ac = AccessController(skud=skud_db, ports=settings["ROOM_PORT_MAP"].values(),
+    #                      visits_db=visits_db, isdaemon=False)
 
-    ac.start(settings["ROOM_PORT_MAP"])
+    # ac.start(settings["ROOM_PORT_MAP"])
     time.sleep(2)
 
 
