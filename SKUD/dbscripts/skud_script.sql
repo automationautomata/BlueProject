@@ -65,6 +65,7 @@ CREATE VIEW access_rules_view
 AS select access_rules.room, 
           rooms.name as roomName,  
           rooms.date_time_begin as roomAddDate, 
+          rooms.date_time_begin as roomDelDate, 
           access_rules.right, 
           rights.name as rightName, 
           rights.date_time_begin as rightAddDate,

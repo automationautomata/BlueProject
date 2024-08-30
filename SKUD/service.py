@@ -63,7 +63,7 @@ def start(settings, name):
     ui_controller = UiController(skud_db=skud_db)
     auth_constroller = AuthenticationController(0, visits_db, skud_db)
 
-    router = [(r"\\ui", SkudQueryHandler, ui_controller)]
+    router = [(r"/ui/(.*)", SkudQueryHandler, dict(uicontroller=ui_controller))]
     # def wl(): 
     #     for i in range(2):
     #         time.sleep(1)            
