@@ -25,7 +25,8 @@ def create_listeners_thread(arduinos: list[ArduinoCommunicator],
         await asyncio.gather(*tasks)
         print(f"Service {threading.get_native_id()} restarted.")
 
-    thread = Thread(target=lambda:asyncio.run(ini()), daemon=isdaemon)
+    thread = Thread(target=lambda:asyncio.run(ini()), daemon=False)
+    print("ard thread", thread.daemon)
     return thread
 
 def arduions_configuring(ports: list[str], 

@@ -37,9 +37,24 @@ The pyvistaqt module.
 %install
 %pyproject_install 
 
-%files 
+#useradd -r {%mod_name}_user
+echo -e "{%mod_name}_user"
 
-%doc LICENSE README.rst
+mkdir -p %buildroot/bin/
+
+mkdir -p /var/lib/skud
+               
+echo -e "%buildroot"
+echo -e "%_sysconfdir"
+
+install -Dm0644 %mod_name %buildroot/bin/
+
+mkdir -p %buildroot%_sysconfdir/systemd/user/
+
+cp %name-service.service %buildroot%_sysconfdir/systemd/user/
+
+
+%files 
 %python3_sitelibdir_noarch/%mod_name
 
 #%python3_sitelibdir/%pypi_name-%version.dist-info

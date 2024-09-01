@@ -64,3 +64,68 @@
 2024-08-30 15:27:40,234 - service-backup - INFO - ("{'a': {'ROOM_PORT_MAP': {'0': '/dev/ttyACM0'}, 'PORT': 9092}}", 'global_settings')
 2024-08-30 15:27:40,234 - service-backup - INFO - ("{'a'}", 'ENABLED')
 2024-08-30 15:27:40,234 - service-backup - INFO - ('a', 'PLACE')
+2024-08-30 18:48:17,496 - service-backup - INFO - sqq /home/alexd/Projects/Python/BlueProject/SKUD/global-settings.json
+2024-08-30 18:48:17,497 - service-backup - INFO - ROOT_DIR /home/alexd/Projects/Python/BlueProject/SKUD
+2024-08-30 18:48:17,497 - service-backup - INFO - ("{'a': {'ROOM_PORT_MAP': {'0': '/dev/ttyACM0'}, 'PORT': 9092}}", 'global_settings')
+2024-08-30 18:48:17,497 - service-backup - INFO - ("{'a'}", 'ENABLED')
+2024-08-30 18:48:17,497 - service-backup - INFO - ('a', 'PLACE')
+2024-08-30 18:49:00,705 - service-backup - INFO - sqq /home/alexd/Projects/Python/BlueProject/SKUD/global-settings.json
+2024-08-30 18:49:00,706 - service-backup - INFO - ROOT_DIR /home/alexd/Projects/Python/BlueProject/SKUD
+2024-08-30 18:49:00,706 - service-backup - INFO - ("{'a': {'ROOM_PORT_MAP': {'0': '/dev/ttyACM0'}, 'PORT': 9092}}", 'global_settings')
+2024-08-30 18:49:00,706 - service-backup - INFO - ("{'a'}", 'ENABLED')
+2024-08-30 18:49:00,706 - service-backup - INFO - ('a', 'PLACE')
+2024-08-30 18:49:17,087 - service-backup - INFO - sqq /home/alexd/Projects/Python/BlueProject/SKUD/global-settings.json
+2024-08-30 18:49:17,088 - service-backup - INFO - ROOT_DIR /home/alexd/Projects/Python/BlueProject/SKUD
+2024-08-30 18:49:17,088 - service-backup - INFO - ("{'a': {'ROOM_PORT_MAP': {'0': '/dev/ttyACM0'}, 'PORT': 9092}}", 'global_settings')
+2024-08-30 18:49:17,088 - service-backup - INFO - ("{'a'}", 'ENABLED')
+2024-08-30 18:49:17,088 - service-backup - INFO - ('a', 'PLACE')
+2024-08-30 18:49:57,076 - service-backup - INFO - sqq /home/alexd/Projects/Python/BlueProject/SKUD/global-settings.json
+2024-08-30 18:49:57,077 - service-backup - INFO - ROOT_DIR /home/alexd/Projects/Python/BlueProject/SKUD
+2024-08-30 18:49:57,077 - service-backup - INFO - ("{'a': {'ROOM_PORT_MAP': {'0': '/dev/ttyACM0'}, 'PORT': 9092}}", 'global_settings')
+2024-08-30 18:49:57,077 - service-backup - INFO - ("{'a'}", 'ENABLED')
+2024-08-30 18:49:57,077 - service-backup - INFO - ('a', 'PLACE')
+2024-08-30 18:50:36,899 - service-backup - INFO - sqq /home/alexd/Projects/Python/BlueProject/SKUD/global-settings.json
+2024-08-30 18:50:36,900 - service-backup - INFO - ROOT_DIR /home/alexd/Projects/Python/BlueProject/SKUD
+2024-08-30 18:50:36,901 - service-backup - INFO - ("{'a': {'ROOM_PORT_MAP': {'0': '/dev/ttyACM0'}, 'PORT': 9092}}", 'global_settings')
+2024-08-30 18:50:36,901 - service-backup - INFO - ("{'a'}", 'ENABLED')
+2024-08-30 18:50:36,901 - service-backup - INFO - ('a', 'PLACE')
+2024-08-30 18:52:17,701 - service-backup - INFO - sqq /home/alexd/Projects/Python/BlueProject/SKUD/global-settings.json
+2024-08-30 18:52:17,701 - service-backup - INFO - ROOT_DIR /home/alexd/Projects/Python/BlueProject/SKUD
+2024-08-30 18:52:17,701 - service-backup - INFO - ("{'a': {'ROOM_PORT_MAP': {'0': '/dev/ttyACM0'}, 'PORT': 9092}}", 'global_settings')
+2024-08-30 18:52:17,702 - service-backup - INFO - ("{'a'}", 'ENABLED')
+2024-08-30 18:52:17,702 - service-backup - INFO - ('a', 'PLACE')
+2024-08-30 18:52:55,337 - service-backup - INFO - sqq /home/alexd/Projects/Python/BlueProject/SKUD/global-settings.json
+2024-08-30 18:52:55,337 - service-backup - INFO - ROOT_DIR /home/alexd/Projects/Python/BlueProject/SKUD
+2024-08-30 18:52:55,338 - service-backup - INFO - ("{'a': {'ROOM_PORT_MAP': {'0': '/dev/ttyACM0'}, 'PORT': 9092}}", 'global_settings')
+2024-08-30 18:52:55,338 - service-backup - INFO - ("{'a'}", 'ENABLED')
+2024-08-30 18:52:55,338 - service-backup - INFO - ('a', 'PLACE')
+2024-08-30 19:09:15,887 - service-backup - INFO - sqq /home/alexd/Projects/Python/BlueProject/SKUD/global-settings.json
+2024-08-30 19:09:15,888 - service-backup - INFO - ROOT_DIR /home/alexd/Projects/Python/BlueProject/SKUD
+2024-08-30 19:09:15,888 - service-backup - INFO - ("{'a': {'ROOM_PORT_MAP': {'0': '/dev/ttyACM0'}, 'PORT': 9092}}", 'global_settings')
+2024-08-30 19:09:15,888 - service-backup - INFO - ("{'a'}", 'ENABLED')
+2024-08-30 19:09:15,888 - service-backup - INFO - ('a', 'PLACE')
+2024-08-30 19:09:54,843 - service-backup - INFO - sqq /home/alexd/Projects/Python/BlueProject/SKUD/global-settings.json
+2024-08-30 19:09:54,843 - service-backup - INFO - ROOT_DIR /home/alexd/Projects/Python/BlueProject/SKUD
+2024-08-30 19:09:54,843 - service-backup - INFO - ("{'a': {'ROOM_PORT_MAP': {'0': '/dev/ttyACM0'}, 'PORT': 9092}}", 'global_settings')
+2024-08-30 19:09:54,843 - service-backup - INFO - ("{'a'}", 'ENABLED')
+2024-08-30 19:09:54,843 - service-backup - INFO - ('a', 'PLACE')
+2024-08-30 19:10:22,254 - service-backup - INFO - sqq /home/alexd/Projects/Python/BlueProject/SKUD/global-settings.json
+2024-08-30 19:10:22,254 - service-backup - INFO - ROOT_DIR /home/alexd/Projects/Python/BlueProject/SKUD
+2024-08-30 19:10:22,254 - service-backup - INFO - ("{'a': {'ROOM_PORT_MAP': {'0': '/dev/ttyACM0'}, 'PORT': 9092}}", 'global_settings')
+2024-08-30 19:10:22,254 - service-backup - INFO - ("{'a'}", 'ENABLED')
+2024-08-30 19:10:22,254 - service-backup - INFO - ('a', 'PLACE')
+2024-08-30 19:10:33,590 - service-backup - INFO - sqq /home/alexd/Projects/Python/BlueProject/SKUD/global-settings.json
+2024-08-30 19:10:33,590 - service-backup - INFO - ROOT_DIR /home/alexd/Projects/Python/BlueProject/SKUD
+2024-08-30 19:10:33,590 - service-backup - INFO - ("{'a': {'ROOM_PORT_MAP': {'0': '/dev/ttyACM0'}, 'PORT': 9092}}", 'global_settings')
+2024-08-30 19:10:33,590 - service-backup - INFO - ("{'a'}", 'ENABLED')
+2024-08-30 19:10:33,590 - service-backup - INFO - ('a', 'PLACE')
+2024-08-30 19:10:47,597 - service-backup - INFO - sqq /home/alexd/Projects/Python/BlueProject/SKUD/global-settings.json
+2024-08-30 19:10:47,597 - service-backup - INFO - ROOT_DIR /home/alexd/Projects/Python/BlueProject/SKUD
+2024-08-30 19:10:47,597 - service-backup - INFO - ("{'a': {'ROOM_PORT_MAP': {'0': '/dev/ttyACM0'}, 'PORT': 9092}}", 'global_settings')
+2024-08-30 19:10:47,597 - service-backup - INFO - ("{'a'}", 'ENABLED')
+2024-08-30 19:10:47,597 - service-backup - INFO - ('a', 'PLACE')
+2024-08-30 20:01:44,555 - service-backup - INFO - sqq /home/alexd/Projects/Python/BlueProject/SKUD/global-settings.json
+2024-08-30 20:01:44,555 - service-backup - INFO - ROOT_DIR /home/alexd/Projects/Python/BlueProject/SKUD
+2024-08-30 20:01:44,555 - service-backup - INFO - ("{'a': {'ROOM_PORT_MAP': {'0': '/dev/ttyACM0'}, 'PORT': 9092}}", 'global_settings')
+2024-08-30 20:01:44,555 - service-backup - INFO - ("{'a'}", 'ENABLED')
+2024-08-30 20:01:44,555 - service-backup - INFO - ('a', 'PLACE')

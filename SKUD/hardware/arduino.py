@@ -79,8 +79,8 @@ class ArduinoCommunicator:
 
                 if start_symb.decode('utf-8') == self.startflag:
                     response = self.connection.read_until(expected=self.endflag.encode())
-                    #print(ard.connection.port, start_symb.decode('utf-8') + response.decode('utf-8'), start_symb + response)
-                    response = self.handler(self.connection.port, start_symb + response, **self.handler_kwargs)
+                    print(self.connection.port, start_symb.decode('utf-8') + response.decode('utf-8'), start_symb + response)
+                    response = self.handler(self.connection.port, start_symb + response, **dict())
                     #response = await self.handler(start_symb + response)
                     if response:
                         self.connection.write(response.encode())

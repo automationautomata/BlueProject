@@ -19,13 +19,13 @@ from general.config import (ROOT_DIR, DB_DIR, BACKUP_DIR, ENABLED_PATH, GLOBAL_S
 
 import psutil
 
-backup_path = "/home/alexd/Projects/Python/BlueProject/SKUD"
-backup = logging.getLogger("service-backup")
+backup_path = os.getcwd()
+backup = logging.getLogger("skud-service-backup")
 
 backup.setLevel(logging.INFO)
 if not os.path.exists(backup_path):
     os.makedirs(backup_path)
-fh = logging.FileHandler(f"{backup_path}/service-backup.log")
+fh = logging.FileHandler(f"{backup_path}/skud-service-backup.log")
 
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 fh.setFormatter(formatter)
@@ -47,10 +47,10 @@ def start(settings, name):
     visits_db = VisitLogger(name=f"{name}-{VISITS_DB_NAME}", dirpath=os.path.join(DB_DIR, name), 
                             scriptpath=VISITS_SCRIPT_PATH, backup_path=os.path.join(BACKUP_DIR, name))
 
-    # ac = AccessController(skud=skud_db, ports=settings["ROOM_PORT_MAP"].values(),
-    #                      visits_db=visits_db, isdaemon=False)
+    ac = AccessController(skud=skud_db, ports=settings["ROOM_PORT_MAP"].values(),
+                          visits_db=visits_db, isdaemon=False)
 
-    # ac.start(settings["ROOM_PORT_MAP"])
+    ac.start(settings["ROOM_PORT_MAP"])
     time.sleep(2)
 
 
