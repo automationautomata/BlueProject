@@ -15,7 +15,7 @@ class Answer:
     
 class Actions(Protocol):
     '''Интерфейс обработки сообщений'''
-    def action_query_map(self) -> dict[str, Callable[[str], Answer]]:
+    def actions_map(self) -> dict[str, Callable[[str], Answer]]:
         '''Метод для контроли и обработки сообщений клиента.'''
         pass
     def verify(self, **kwargs) -> bool:
@@ -40,11 +40,10 @@ class WebsoketClients(Singleton):
         self.__ws_clients[key] = client
         return key 
     
-    def __item__(self, key: int) -> WebSocketHandler | None:
+    def __item__(self, key: int): #-> WebSocketHandler | None:
         '''Получить соединение по номеру. `key` - ключ.'''
         if key in self.__ws_clients:
             return self.__ws_clients[key]
-        return None
     
     def remove(self, key: int) -> bool:
         '''Удалить соединение из списка. `key` - ключ.'''

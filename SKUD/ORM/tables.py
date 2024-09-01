@@ -19,6 +19,14 @@ class RemoteSessions:
     def toJSON(self):
         return json.dump(self.__dict__)
 
+class History():
+    def __init__(self, action: str, table: str, 
+                       type: str = None, values: str  = None) -> None:
+        self.action = action
+        self.table = table
+        self.type = type
+        self.values = values
+        self.date_time = datetime.now().isoformat()
 
 class EntityView:
      def __init__(self, **kwargs) -> None:

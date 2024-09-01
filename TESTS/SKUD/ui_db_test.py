@@ -15,7 +15,7 @@ from remote.tools import Answer
 
 class QueryHandler(tornado.web.RequestHandler):
     def initialize(self, action) -> None:
-        self.actions = action.action_query_map()
+        self.actions = action.actions_map()
         self.verify = action.verify
 
     def get(self) -> None:
@@ -46,11 +46,11 @@ class QueryHandler(tornado.web.RequestHandler):
             self.write(answer.toJSON())
 
 class AuthenticationHandler(tornado.web.RequestHandler):
-    def initialize(self, verificator: Callable[[str], Answer]):
-        self.verificator = verificator
+    def initialize(self, authenticatior: Callable[[str], Answer]):
+        self.authenticatior = authenticatior
 
     def get(self) -> None:
-        answer = self.verificator(self.get_body_argument("auth"))
+        answer = self.authenticatior(self.get_body_argument("auth"))
         self.write(answer.toJSON())
 
 
@@ -63,7 +63,7 @@ a = AuthenticationController(0, visits, skud_db)
 ui = UiSKUDController(skud_db=skud_db)
 app = tornado.web.Application([
     (r"/ui+", QueryHandler, dict(action=ui)), 
-    (r"/auth", AuthenticationHandler, dict(verificator=a.verificator))
+    (r"/auth", AuthenticationHandler, dict(authenticatior=a.authenticatior))
     ])
 app.listen(8080)
 

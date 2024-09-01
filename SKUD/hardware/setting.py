@@ -1,4 +1,5 @@
 import asyncio
+import threading
 import serial, serial.tools.list_ports
 from typing import Callable
 from threading import Thread
@@ -11,7 +12,8 @@ def getportsinfo() -> str:
     getinfo = lambda port: '{'+f"\"Port\": \"{port.device}\",\
                                  \"Description\": \"{port.description}\", \
                                  \"Manufacturer\": \"{port.manufacturer}\""+'}'
-    return '{'+f"{',\n'.join(getinfo(port) for port in ports)}"+'}'
+    ports = ',\n'.join(getinfo(port) for port in ports)
+    return '{'+f"{ports}"+'}'
 
 def create_listeners_thread(arduinos: list[ArduinoCommunicator], 
                             start_sleep_time: int = 0,  delta: int = 0.001, isdaemon: bool = True) -> Thread:
@@ -21,15 +23,18 @@ def create_listeners_thread(arduinos: list[ArduinoCommunicator],
     async def ini():
         tasks = [asyncio.create_task(ard.listener(start_sleep_time + ind*delta)) for ind, ard in enumerate(arduinos)]
         await asyncio.gather(*tasks)
-    thread = Thread(target=lambda:asyncio.run(ini()), daemon=isdaemon)
+        print(f"Service {threading.get_native_id()} restarted.")
+
+    thread = Thread(target=lambda:asyncio.run(ini()), daemon=False)
+    print("ard thread", thread.daemon)
     return thread
 
 def arduions_configuring(ports: list[str], 
-                        handler: Callable[[bytes], str], handler_kwargs=None) -> tuple[Thread, dict[str, ArduinoCommunicator]]: 
+                        handler: Callable[[bytes], str], isdaemon=True, handler_kwargs=None) -> tuple[Thread, dict[str, ArduinoCommunicator]]: 
     '''Настройка группы адруино, подключенных к портам из `ports` и с обработчиком входных данных `handler`,
     `handler_kwargs` - его аргументы'''
     arduinos = {}
     for port in ports:
         arduinos[port] = ArduinoCommunicator(port=port, handler=handler, handler_kwargs=handler_kwargs)
-    thread = create_listeners_thread(list(arduinos.values()))
+    thread = create_listeners_thread(list(arduinos.values()), isdaemon=isdaemon)
     return thread, arduinos

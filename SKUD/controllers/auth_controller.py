@@ -1,12 +1,13 @@
 import json
-import random as rnd
+import logging
+from random import randint 
 from datetime import datetime, timedelta
 
 from ORM.database import DatabaseConnection
-from ORM.loggers import Logger, VisitLogger
-from ORM.queries import condition_query
+from ORM.loggers import VisitLogger
+from ORM.templates import condition_query
 from general.singleton import Singleton
-from remote.ui import Answer
+from remote.server import Answer
 
 class Tokens(Singleton):
     '''Класс для хранения токенов сессий'''
@@ -22,13 +23,13 @@ class Tokens(Singleton):
             val = self.__tokens[id]
             return val[0] == token and val[1] - now <= self.duration
         return False         
-    def add(self, id: str | int) -> int:
+    def add(self, id):#: str | int) -> int:
         '''Генерирует новый токен с `id`'''
-        token = rnd.randint(0, self.__randmax)
+        token = randint(0, self.__randmax)
         self.__tokens[id] = (token, datetime.now())
         return token
     
-    def remove(self, id: str | int) -> bool:
+    def remove(self, id):#: str | int) -> bool:
         '''Удаление токена'''
         if id in self.__tokens:
             del self.__tokens[id]
@@ -37,7 +38,7 @@ class Tokens(Singleton):
         
 class AuthenticationController:
     def __init__(self, remote_right: int, visits_db: VisitLogger, 
-                       skud_db: DatabaseConnection, Debug: bool = False) -> None:
+                       skud_db: DatabaseConnection, Debug: bool = False,  logger: logging.Logger = None) -> None:
         self.visits_db = visits_db
         self.skud_db = skud_db
         self.remote_right = remote_right
@@ -48,17 +49,20 @@ class AuthenticationController:
         sql = condition_query("access_rules", ["room"], f"right = {self.remote_right}")
         print(sql)
         self.remote_rooms = {row[0] for row in self.skud_db.execute_query(sql)}
+        self.logger = logger
 
-    def verificator(self, data) -> Answer:  
+    def authenticatior(self, data) -> Answer:  
         try:
             msg = json.loads(data)
             if msg['id'] in self.remote_rooms:
-                sql = condition_query("entities", ["card"], 
-                                     f"right = {self.remote_right} and card = {msg['key']}")
+                sub_sql = condition_query("cards", ['*'], f"number = {msg['key']}")[0:-1]
+                sql = condition_query(f"entities inner join ({sub_sql}) as c on entities.card = c.id", ["c.number"], 
+                                     f"right = {self.remote_right}")
+                
                 card = self.skud_db.execute_query(sql) 
-
                 #### DEBUG ####
-                if self.Debug: print("data:", data, "card:", card)
+                if self.Debug: print("data:", data, "number:", card)
+                if self.logger: self.logger.debug(f"data: {data}, card: {card}")
 
                 if len(card) == 1:
                     token = self.tokens.add(msg['id'])
@@ -71,4 +75,6 @@ class AuthenticationController:
             #### DEBUG ####
             if self.Debug: print("ERROR:", str(error))
 
+            if self.logger:
+                self.logger.warning(f"{error}; In AuthenticationController.authenticatior with data = {data}")
             return Answer(0, str(error))

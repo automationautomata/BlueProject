@@ -1,7 +1,8 @@
 -------------------------TABLES-------------------------
 
 CREATE TABLE cards (
-    id VARCHAR(4) PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    number INTEGER NOT NULL,
     isSabotaged VARCHAR(1) NOT NULL,
     date_time_begin TEXT NOT NULL,
     date_time_end TEXT
@@ -10,7 +11,9 @@ CREATE TABLE cards (
 CREATE TABLE rooms (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     name TEXT NOT NULL,
-    date_time TEXT NOT NULL
+    date_time_begin TEXT NOT NULL,
+    date_time_end TEXT, 
+    UNIQUE(name)
 );
 CREATE TABLE rights (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -43,6 +46,7 @@ CREATE TABLE entities (
 
 CREATE VIEW entities_view 
 AS select card, 
+          cards.number as cardsNumber,  
           cards.isSabotaged as isSabotagedCard,  
           cards.date_time_begin as cardAddDate, 
           cards.date_time_end as cardDelDate, 
@@ -61,33 +65,33 @@ CREATE VIEW access_rules_view
 AS select access_rules.room, 
           rooms.name as roomName,  
           rooms.date_time_begin as roomAddDate, 
+          rooms.date_time_begin as roomDelDate, 
           access_rules.right, 
           rights.name as rightName, 
           rights.date_time_begin as rightAddDate,
           rights.date_time_end as rightDelDate, 
           access_rules.date_time_begin as ruleAddDate,
           access_rules.date_time_end as ruleDelDate
-            from entities inner join rooms on rooms.id = access_rules.room    
+            from access_rules inner join rooms on rooms.id = access_rules.room    
                         inner join rights on access_rules.right = rights.id;
-
 --------------------------------------------------------------------------------    
 
-INSERT into cards (id, isSabotaged, date_time_begin) values (12, 0, strftime('%Y-%m-%d %H:%M:%S', datetime('now'))), 
-                                                            (15, 0, strftime('%Y-%m-%d %H:%M:%S', datetime('now')));             
-INSERT into rooms (name, date_time) values ('office', strftime('%Y-%m-%d %H:%M:%S', datetime('now'))), 
-                                           ('work'  , strftime('%Y-%m-%d %H:%M:%S', datetime('now'))),
-                                           ('UI'    , strftime('%Y-%m-%d %H:%M:%S', datetime('now')));
+INSERT into cards (number, isSabotaged, date_time_begin) values (12, 0, strftime('%Y-%m-%d %H:%M:%S', datetime('now'))), 
+                                                                (15, 0, strftime('%Y-%m-%d %H:%M:%S', datetime('now')));             
+INSERT into rooms (name, date_time_begin) values ('office', strftime('%Y-%m-%d %H:%M:%S', datetime('now'))), 
+                                                 ('work'  , strftime('%Y-%m-%d %H:%M:%S', datetime('now'))),
+                                                 ('UI'    , strftime('%Y-%m-%d %H:%M:%S', datetime('now')));
                                                                    
 INSERT into rights (name, date_time_begin) values ('admin'   ,  strftime('%Y-%m-%d %H:%M:%S', datetime('now'))), 
                                                   ('employee',  strftime('%Y-%m-%d %H:%M:%S', datetime('now')));
 
-INSERT into access_rules (right, room, date_time_begin) values (0, 0, strftime('%Y-%m-%d %H:%M:%S', datetime('now'))), 
-                                                               (0, 1, strftime('%Y-%m-%d %H:%M:%S', datetime('now'))),
-                                                               (0, 2, strftime('%Y-%m-%d %H:%M:%S', datetime('now'))),
-                                                               (1, 1, strftime('%Y-%m-%d %H:%M:%S', datetime('now')));
+INSERT into access_rules (right, room, date_time_begin) values (1, 1, strftime('%Y-%m-%d %H:%M:%S', datetime('now'))), 
+                                                               (1, 2, strftime('%Y-%m-%d %H:%M:%S', datetime('now'))),
+                                                               (1, 3, strftime('%Y-%m-%d %H:%M:%S', datetime('now'))),
+                                                               (2, 2, strftime('%Y-%m-%d %H:%M:%S', datetime('now')));
                                                                
-INSERT into entities (card, sid, type, right, date_time_begin) values (12, 1, 0, 0, strftime('%Y-%m-%d %H:%M:%S', datetime('now'))), 
-                                                                      (15, 5, 0, 1, strftime('%Y-%m-%d %H:%M:%S', datetime('now')));
+INSERT into entities (card, sid, type, right, date_time_begin) values (1, 1, 0, 1, strftime('%Y-%m-%d %H:%M:%S', datetime('now'))), 
+                                                                      (2, 5, 0, 2, strftime('%Y-%m-%d %H:%M:%S', datetime('now')));
 -- CREATE TRIGGER subotaged_card_not_in_entities
 -- INSERT INSERT ON cards
 -- BEGIN

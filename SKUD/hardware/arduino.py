@@ -1,5 +1,6 @@
 import asyncio
 from datetime import datetime
+import logging
 from typing import Any, Callable
 import schedule
 import serial
@@ -7,8 +8,8 @@ import serial.tools.list_ports
 
 class ArduinoCommunicator:
     '''Класс для отправки данных на ардуино'''
-    def __init__(self, port: str, handler: Callable[[str, bytes, Any], str | None], handler_kwargs = None, startflag: str = "{", endflag: str = "}", 
-                 format_send: Callable[[Any], str] = None, logger = None, baudrate: int = 9600) -> None:
+    def __init__(self, port: str, handler: Callable[[str, bytes, Any], str], handler_kwargs = None, startflag: str = "{", endflag: str = "}", 
+                 format_send: Callable[[Any], str] = None, logger: logging.Logger = None, baudrate: int = 9600) -> None:
         '''`port` - номер COM порта, `format_send` - функция, превращающая входные данные в строку, 
         `logger` - сохраняет ошибки и доп.информацию в БД, `baudrate` - частота'''
         self.connection = serial.Serial(port, baudrate)
@@ -49,10 +50,10 @@ class ArduinoCommunicator:
             return self.communicate(self.format_send(data))
         except BaseException as error: 
             if self.logger:
-                self.logger.addlog(f"In ArduinoCommunicator.communicate() with input data: {data} ERROR: {error}")
+                self.logger.exception(f"{error}; In ArduinoCommunicator.communicate() with input data: {data}")
             print(error)
 
-    def write(self, data: str) -> str | None:
+    def write(self, data: str):# -> str | None:
         '''Отправляет данные в формате строки на ардуино и возвращает ответ от него, 
         если соединение закрыто, то открывает его заново'''
         try:
@@ -62,7 +63,7 @@ class ArduinoCommunicator:
             return self.connection.write(data.encode())
         except BaseException as error: 
             if self.logger:
-                self.logger.addlog(f"In ArduinoCommunicator.communicate() with input data: {data} ERROR: {error}")
+                self.logger.exception(f"{error}; In ArduinoCommunicator.communicate() with input data: {data}")
             print(error)
 
     async def listener(self, timeout) -> None:
@@ -74,12 +75,12 @@ class ArduinoCommunicator:
             #print(self.connection.port)  
             if self.connection.in_waiting > 0:
                 start_symb = self.connection.read(1)
-                print("listener", start_symb.decode('utf-8'))
+                #print("listener", start_symb.decode('utf-8'))
 
                 if start_symb.decode('utf-8') == self.startflag:
                     response = self.connection.read_until(expected=self.endflag.encode())
-                    #print(ard.connection.port, start_symb.decode('utf-8') + response.decode('utf-8'), start_symb + response)
-                    response = self.handler(self.connection.port, start_symb + response, **self.handler_kwargs)
+                    print(self.connection.port, start_symb.decode('utf-8') + response.decode('utf-8'), start_symb + response)
+                    response = self.handler(self.connection.port, start_symb + response, **dict())
                     #response = await self.handler(start_symb + response)
                     if response:
                         self.connection.write(response.encode())

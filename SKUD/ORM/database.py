@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import logging
 import sqlite3
 import os
 import threading
@@ -24,14 +25,24 @@ class DatabaseABC(ABC):
     def close(self) -> None: 
         pass
 
-class DatabaseConnection(DatabaseABC, Singleton):
-    def __init__(self, scriptpath: str, name: str, dirpath: str = os.getcwd()) -> None:
+class DatabaseConnection(DatabaseABC):
+    def __init__(self, scriptpath: str, name: str, dirpath: str = os.getcwd(), backup_path: str = os.path.join(os.getcwd(), "backup.log")) -> None:
         '''`scriptpath` - путь к скрипту, создающему бд,
-        `name` - название БД, `dirpath` - папка с БД'''
+        `name` - название БД, `dirpath` - папка с БД, `backup_path` - путь к бекапу БД.'''
         self.__scriptpath = scriptpath
         self.path = os.path.join(dirpath, name)
         self._connections_ = {} #: dict[int, sqlite3.Connection] = {}
-        
+        self.backup = logging.getLogger(f"{name}-backup")
+
+        self.backup.setLevel(logging.INFO)
+        if not os.path.exists(backup_path):
+            os.makedirs(backup_path)
+        fh = logging.FileHandler(os.path.join(backup_path, f"{name}-backup.log"))
+
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        fh.setFormatter(formatter)
+        self.backup.addHandler(fh)
+
     def threadsafe_connect(self) -> sqlite3.Connection:
         thread_id = threading.get_native_id()
         if thread_id not in self._connections_.keys():
@@ -48,8 +59,8 @@ class DatabaseConnection(DatabaseABC, Singleton):
         то пересоздает ее на основе указанного скрипта.'''
         dir = os.path.dirname(self.path)
         if not os.path.exists(dir):
-            if not os.path.exists(self.path):
-                os.mkdir(dir)
+            os.makedirs(dir)
+        if not os.path.exists(self.path):           
             self._createdatabase_()
         else: 
             self.threadsafe_connect()
@@ -78,12 +89,18 @@ class DatabaseConnection(DatabaseABC, Singleton):
         cursor = conn.cursor()
         result = cursor.execute(command, params)
         conn.commit()
+        if result:
+            self.backup.info('{'+f"\"SQL\": {command}; \"VALUES\": {params}"+'}')
         return result
         
     def table_cols(self, table: str):
         sql = f"SELECT c.name FROM pragma_table_info('{table}') as c;"
         return list(map(lambda row: row[0], self.execute_query(sql)))
     
+    def table_pk(self, table: str):
+        sql = f"select info.name from pragma_table_info('{table}') as info WHERE info.pk = 1"
+        return self.execute_query(sql)[0]
+
     def rows_to_dicts(self, col_names: list[str], rows: list[tuple]) -> list[dict]:
         data = []
         for row in rows:
