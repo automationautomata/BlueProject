@@ -5,3 +5,6 @@
 [submodule "Card Controller"]
 	path = Card Controller
 	url = https://github.com/automationautomata/Card-Controller.git
+[submodule "SKUD"]
+	path = SKUD
+	url = https://github.com/automationautomata/SKUD.git
