@@ -1,10 +1,16 @@
 [submodule "UI"]
 	path = UI
 	url = https://github.com/automationautomata/ACS-UI.git
+	branch = main
+
 
 [submodule "Card Controller"]
 	path = Card Controller
 	url = https://github.com/automationautomata/Card-Controller.git
+	branch = main
+
 [submodule "SKUD"]
 	path = SKUD
 	url = https://github.com/automationautomata/SKUD.git
+	branch = master
+
